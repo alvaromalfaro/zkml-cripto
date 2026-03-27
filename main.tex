@@ -10,6 +10,7 @@
 \usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
 \usepackage{amsmath, amsthm, amsfonts}
 \usepackage{graphicx}
+\usepackage{subcaption}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \setlength{\parskip}{1.5mm}
 
@@ -40,8 +41,9 @@ Cero}
 % Fundamentos teóricos
 \section{Fundamentos teóricos}
 En esta sección se presentan los conceptos teóricos necesarios para el desarrollo del trabajo,
-incluyendo una introducción a los modelos de aprendizaje automático, las pruebas de conocimiento
-cero y los fundamentos matemáticos sobre los que se asientan.
+incluyendo una introducción a los modelos de aprendizaje automático, con un enfoque en las redes
+neuronales artificiales y, posteriormente, las pruebas de conocimiento cero y los fundamentos
+matemáticos sobre los que se asientan.
 
 \subsection{Aprendizaje Automático}
 El \textbf{aprendizaje automático} es una rama de la inteligencia artificial centrada en conseguir
@@ -69,20 +71,20 @@ donde cada uno de ellos simboliza la fuerza de la conexión, también conocida c
 red neuronal suele contener desde algunas decenas hasta miles o incluso millones de neuronas
 artificiales, organizadas en diferentes \textit{capas}. Las neuronas de cada capa se encuentran
 conectadas a las de la capa siguiente. Un ejemplo típico de red neuronal se muestra en la Figura
-\ref{fig:nn}, la cual está compuesta por una capa de entrada, dos capas ocultas y una capa de
-salida. Cuando una red neuronal contiene una o más capas ocultas, se denomina
-\textit{red neuronal profunda}, siendo este el caso mostrado y, en general, el más común en la
-actualidad.
+\ref{fig:nn}, la cual está compuesta por una capa de entrada con $N_i$ neuronas, una capa de salida
+con $N_o$ neuronas y varias capas ocultas con $N_h$ neuronas. Cuando una red neuronal contiene
+una o más capas ocultas, se denomina \textit{red neuronal profunda}, siendo este el caso mostrado y,
+en general, el más común en la actualidad.
 
 \begin{figure}
   \centering
   \includegraphics[width=0.6\textwidth]{figs/nn.png}
-  \caption{Ejemplo de red neuronal artificial.}
+  \caption{Ejemplo de red neuronal artificial \cite{krose1996introduction}.}
   \label{fig:nn}
 \end{figure}
 
-En cada neurona, se realiza una suma ponderada de las señales recibidas a través de sus enlaces, de
-forma que, en una cierta neurona $k$, la entrada total que recibe en un instante de tiempo $t$ viene
+En cada neurona, se realiza una suma ponderada de las señales recibidas a través de sus enlaces. Así,
+en una cierta neurona $k$, la entrada total que recibe en un instante de tiempo $t$ viene
 dada por
 \begin{equation}
   s_k(t) = \sum_{j} w_{jk}(t) y_j(t) + \theta_k(t) \label{na_entrada_total}
@@ -95,25 +97,141 @@ finalmente, $\theta_k(t)$ representa el \textit{sesgo} de la neurona $k$, un val
 permite ajustar su umbral de activación.
 
 Tras ello, la neurona $k$ aplica una \textit{función de activación} a su entrada total, $s_k(t)$,
-para generar su salida $y_k(t+1)$. Así, la salida de la neurona vendrá dada por
+para generar su salida, tal que
 \begin{equation}
   y_k(t+1) = \mathcal{F}(s_k(t)) \label{na_activacion}
 \end{equation}
-Normalmente, $\mathcal{F}$ suele ser una función no lineal debido a que esto es lo que permite a
-las redes neuronales aprender patrones complejos en los datos. Algunas de las funciones de
-activación más utilizadas se muestran en la Figura \ref{fig:activation_functions}. Sin embargo, no
-se profundizará en ellas debido a que no resulta especialmente relevante para el desarrollo del
-trabajo. Hay extensa literatura sobre el tema, por lo que una simple búsqueda de artículos o libros
-sobre redes neuronales artificiales o aprendizaje profundo proporcionará una gran cantidad de
-información al respecto
+En general, $\mathcal{F}$ suele ser una función no lineal debido a que esto es lo que permite a las
+redes neuronales aprender patrones complejos en los datos. Algunas de las funciones de activación
+más utilizadas se muestran en la Figura \ref{fig:funciones_activacion}. Sin embargo, no se
+profundizará en ellas debido a que no resulta especialmente relevante para el desarrollo del trabajo.
+Hay extensa literatura sobre el tema, por lo que una simple búsqueda de artículos o libros sobre
+redes neuronales artificiales o aprendizaje profundo proporcionará una gran cantidad de información
+al respecto
 \cite{kunc2024decadesactivationscomprehensivesurvey,dubey2022activationfunctionsdeeplearning}. A
 pesar de ello, un aspecto importante a destacar es que es condición necesaria que la función de
-activación sea diferenciable o, al menos, diferenciable en casi todo punto, ya que esto es lo que
-permite el proceso de entrenamiento, basado en la \textit{propagación hacia atrás} del error y el
-uso de algoritmos de optimización como el \textit{descenso de gradiente}.
+activación sea diferenciable o, al menos, diferenciable en casi todo punto, ya que esto será
+necesario en el proceso de entrenamiento, basado en la \textit{propagación hacia atrás} del error y
+el uso de algoritmos de optimización como el \textit{descenso de gradiente} \cite{krose1996introduction}.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figs/relu.png}
+    \caption{Rectified Linear Unit (ReLU)}
+    \label{fig:relu}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figs/prelu.png}
+    \caption{Parametric ReLU (PReLU)}
+    \label{fig:prelu}
+  \end{subfigure}
+
+  \vspace{0.5cm}
+
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figs/logistic.png}
+    \caption{Función logística}
+    \label{fig:logistic}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figs/tanh.png}
+    \caption{Función tangente hiperbólica}
+    \label{fig:tanh}
+  \end{subfigure}
+
+  \caption{Funciones de activación en redes neuronales.}
+  \label{fig:funciones_activacion}
+\end{figure}
 
 
 \subsubsection{Entrenamiento en una red neuronal artificial}
+
+Llegados a este punto, se habrá observado que no se ha hecho mención alguna a cómo se determinan los
+pesos de los enlaces. Esto se debe a que, en general, no se establecen manualmente, más allá de una
+inicialización aleatoria, sino que se aprenden mediante el proceso de \textit{entrenamiento}. Dado
+un conjunto de datos de entrenamiento, $\mathcal{X}$, este consiste en cuatro simples pasos
+\cite{krose1996introduction}:
+\begin{enumerate}
+  \item Inicializar los pesos de la red neuronal de forma aleatoria.
+  \item Seleccionar un ejemplo de entrenamiento $x \in \mathcal{X}$ e introducirlo por la capa de
+        entrada, de forma que cada neurona genere una señal de salida que transmitirá a las neuronas
+        de la capa siguiente, y así sucesivamente, hasta llegar a la capa de salida, donde se
+        generará una salida $y$.
+  \item Si $y$ es diferente a la salida deseada o esperada, $d(x)$, modificar los pesos de la red
+        neuronal de acuerdo al error.
+  \item Volver al paso 2 hasta alcanzar un cierto criterio de parada, como puede ser un número máximo
+        de iteraciones o un umbral de error mínimo.
+\end{enumerate}
+Intuitivamente, es fácil ver que el entrenamiento no es más que un proceso iterativo de prueba y
+error, donde se ajustan los pesos de la red neuronal para que su salida converja a la salida deseada
+para cada ejemplo de entrenamiento. Matemáticamente, no es un proceso trivial.
+
+Se asume una red neuronal formada por una única capa y una única neurona de salida con función de
+activación lineal. En este caso, la salida viene dada por
+\begin{equation}
+  y = \sum_{j} w_j x_j + \theta \label{na_salida_lineal}
+\end{equation}
+teniendo así la red capacidad de aprender relaciones lineales entre la entrada y la salida. Contando
+con un conjunto de entrenamiento formado por valores $x^p$ y salidas deseadas $d^p$, el objetivo
+será encontrar el hiperplano que mejor se ajuste a los datos, es decir, encontrar los pesos $w_j$
+que minimicen el error entre la salida de la red neuronal $y^p$ y la salida deseada $d^p$ para cada
+ejemplo de entrenamiento $p$. Para ello, se define una función de error, $E$, tal que
+\begin{equation}
+  E = \frac{1}{2} \sum_{p} (d^p - y^p)^2 \label{na_funcion_error}
+\end{equation}
+esto es, el error cuadrático medio entre la salida de la red neuronal y la salida deseada. Una vez
+calculada la función de error, se actualizan los pesos de la red neuronal mediante el algoritmo de
+descenso de gradiente.
+
+El objetivo del descenso de gradiente es minimizar la función de error $E$ modificando los pesos
+proporcionalmente a la dirección del gradiente negativo de $E$, esto es,
+\begin{equation}
+  \Delta_p w_j = - \eta \frac{\partial E^p}{\partial w_j} =
+  - \eta \frac{\partial E^p}{\partial y^p} \frac{\partial y^p}{\partial w_j} =
+  - \eta \frac{\partial E^p}{\partial y^p} x_j =
+  \eta (d^p - y^p) x_j =
+  \eta \delta^p x_j \label{na_descenso_gradiente}
+\end{equation}
+siendo $\eta$ una constante de proporcionalidad, también conocida como \textit{tasa de aprendizaje},
+que controla el tamaño de los pasos que se dan en la dirección del gradiente negativo y denotando
+$\delta^p$ a la diferencia entre la salida deseada y la salida obtenida.
+
+Es fácil generalizar a redes neuronales con múltiples capas y neuronas de salida, con funciones de
+activación no lineales. La activación de cada neurona es una función de la entrada total y, como se
+ha mencionado, diferenciable, tal que
+\begin{equation}
+  y_k^p = \mathcal{F}(s_k^p) = \mathcal{F}(\sum_j w_{jk} y_j^p + \theta_k) \label{na_activacion_general}
+\end{equation}
+y, a partir de la función de error,
+\begin{equation}
+  E^p = \frac{1}{2} \sum_{o=1}^{N_o} (d_o^p - y_o^p)^2 \label{na_funcion_error_general}
+\end{equation}
+donde $d_o^p$ es la salida deseada para la neurona de salida $o$ y $y_o^p$ es la salida obtenida
+para la neurona de salida $o$. Denotando
+\begin{equation}
+  E = \sum_p E^p \label{na_funcion_error_total}
+\end{equation}
+como la función de error total, el descenso de gradiente se generaliza a
+\begin{equation}
+  \Delta_p w_{jk} = - \eta \frac{\partial E^p}{\partial w_{jk}} =
+  - \eta \frac{\partial E^p}{\partial s_k^p} \frac{\partial s_k^p}{\partial w_{jk}} =
+  - \eta \frac{\partial E^p}{\partial s_k^p} y_j^p =
+  \eta \delta_k^p y_j^p
+  \label{na_descenso_gradiente_general}
+\end{equation}
+Siendo $\delta_k^p = - \frac{\partial E^p}{\partial s_k^p}$, se obtiene una regla de actualización
+de los pesos equivalente a la de la Ecuación \ref{na_descenso_gradiente}. Ahora, cabe preguntarse
+cómo se calcula $\delta_k^p$ para cada neurona $k$. Aquí es donde entra en juego el algoritmo de
+\textit{propagación hacia atrás}, el cual se basa en la aplicación de la regla de la cadena para
+calcularlo a partir de las neuronas de salida y, luego, ir propagando hacia atrás el error, a través
+de las capas ocultas, hasta llegar a la capa de entrada.
 
 
 \bibliographystyle{ieeetr}
