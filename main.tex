@@ -171,7 +171,11 @@ un conjunto de datos de entrenamiento, $\mathcal{X}$, este consiste en cuatro si
 \end{enumerate}
 Intuitivamente, es fácil ver que el entrenamiento no es más que un proceso iterativo de prueba y
 error, donde se ajustan los pesos de la red neuronal para que su salida converja a la salida deseada
-para cada ejemplo de entrenamiento. Matemáticamente, no es un proceso trivial.
+para cada ejemplo de entrenamiento. Matemáticamente, no es un proceso trivial. A continuación, se
+presenta una explicación detallada de cómo se consigue actualizar los pesos de la red; sin embargo,
+al final de la sección se mostrará un resumen de todo el proceso, haciendo mención a las dos
+ecuaciones que lo rigen, pudiendo ser de utilidad para aquellos lectores que no deseen profundizar
+en los detalles matemáticos.
 
 Se asume una red neuronal formada por una única capa y una única neurona de salida con función de
 activación lineal. En este caso, la salida viene dada por
@@ -209,16 +213,13 @@ ha mencionado, diferenciable, tal que
 \begin{equation}
   y_k^p = \mathcal{F}(s_k^p) = \mathcal{F}(\sum_j w_{jk} y_j^p + \theta_k) \label{na_activacion_general}
 \end{equation}
-y, a partir de la función de error,
+siendo $w_{jk}$ el peso del enlace entre la neurona $j$ de la capa anterior y la neurona $k$ y
+$y_j^p$ la salida de la neurona $j$. Con ello, a partir de la función de error,
 \begin{equation}
   E^p = \frac{1}{2} \sum_{o=1}^{N_o} (d_o^p - y_o^p)^2 \label{na_funcion_error_general}
 \end{equation}
-donde $d_o^p$ es la salida deseada para la neurona de salida $o$ y $y_o^p$ es la salida obtenida
-para la neurona de salida $o$. Denotando
-\begin{equation}
-  E = \sum_p E^p \label{na_funcion_error_total}
-\end{equation}
-como la función de error total, el descenso de gradiente se generaliza a
+donde $d_o^p$ y $y_o^p$ representan la salida deseada y la salida obtenida en la neurona de salida
+$o$, el descenso de gradiente se generaliza a
 \begin{equation}
   \Delta_p w_{jk} = - \eta \frac{\partial E^p}{\partial w_{jk}} =
   - \eta \frac{\partial E^p}{\partial s_k^p} \frac{\partial s_k^p}{\partial w_{jk}} =
@@ -229,9 +230,74 @@ como la función de error total, el descenso de gradiente se generaliza a
 Siendo $\delta_k^p = - \frac{\partial E^p}{\partial s_k^p}$, se obtiene una regla de actualización
 de los pesos equivalente a la de la Ecuación \ref{na_descenso_gradiente}. Ahora, cabe preguntarse
 cómo se calcula $\delta_k^p$ para cada neurona $k$. Aquí es donde entra en juego el algoritmo de
-\textit{propagación hacia atrás}, el cual se basa en la aplicación de la regla de la cadena para
-calcularlo a partir de las neuronas de salida y, luego, ir propagando hacia atrás el error, a través
-de las capas ocultas, hasta llegar a la capa de entrada.
+\textit{propagación hacia atrás}, el cual se basa en calcular el error en las neuronas de salida y,
+luego, ir propagándolo hacia atrás, a través de las capas ocultas, hasta llegar a la capa de entrada.
+
+Aplicamos la regla de la cadena para calcular $\delta_k^p$ como el producto de dos términos, uno que
+representa el cambio en la función de error con respecto a la salida de la neurona $k$ y otro que
+representa el cambio en la salida de la misma neurona con respecto a su entrada total, esto es,
+\begin{equation}
+  \delta_k^p = - \frac{\partial E^p}{\partial s_k^p} =
+  - \frac{\partial E^p}{\partial y_k^p} \frac{\partial y_k^p}{\partial s_k^p}
+  \label{na_delta}
+\end{equation}
+Por un lado, como $y_k^p = \mathcal{F}(s_k^p)$, se tiene que
+\begin{equation}
+  \frac{\partial y_k^p}{\partial s_k^p} = \mathcal{F}'(s_k^p) \label{na_derivada_activacion}
+\end{equation}
+Por otro lado, para el término $\frac{\partial E^p}{\partial y_k^p}$, si $k$ es una neurona de
+salida, $k = o$, se obtiene
+\begin{equation}
+  \frac{\partial E^p}{\partial y_k^p} = -(d_o^p - y_o^p)
+\end{equation}
+De esta forma, la regla de actualización de los pesos para cada neurona de salida $o$ viene dada por
+\begin{equation}
+  \Delta_p w_{jo} = \eta \delta_o^p y_j^p = \eta \mathcal{F}'(s_o^p) (d_o^p - y_o^p) y_j^p
+  \label{na_actualizacion_salida}
+\end{equation}
+Ahora, si $k$ es una neurona oculta, no es posible saber cuánto contribuye $k$ al error fácilmente.
+Si tenemos en cuenta que el error puede ser calculado como función de las salidas de las neuronas
+ocultas a la capa de salida, $E^p = E^p(s_1^p, s_2^p, \ldots, s_j^p, \ldots)$, mediante la regla de
+la cadena, se obtiene
+\begin{equation}
+  \frac{\partial E^p}{\partial y_h^p} =
+  \sum_{o=1}^{N_o} \frac{\partial E^p}{\partial s_o^p} \frac{\partial s_o^p}{\partial y_h^p} =
+  \sum_{o=1}^{N_o} \frac{\partial E^p}{\partial s_o^p} \frac{\partial}{\partial y_h^p} \sum_{j=1}^{N_h} w_{ko} y_j^p =
+  \sum_{o=1}^{N_o} \frac{\partial E^p}{\partial s_o^p} w_{ho} =
+  - \sum_{o=1}^{N_o} \delta_o^p w_{ho}
+  \label{na_error_oculto}
+\end{equation}
+Con ello, se obtiene
+\begin{equation}
+  \delta_h^p = \mathcal{F}'(s_h^p) \sum_{o=1}^{N_o} \delta_o^p w_{ho}
+  \label{na_actualizacion_oculta}
+\end{equation}
+y, por tanto, la regla de actualización de los pesos para cada neurona oculta $h$ viene dada por
+\begin{equation}
+  \Delta_p w_{jh} = \eta \delta_h^p y_j^p = \eta \mathcal{F}'(s_h^p) (\sum_{o=1}^{N_o} \delta_o^p w_{ho}) y_j^p
+  \label{na_actualizacion_oculta_pesos}
+\end{equation}
+
+Como ya se ha comentado, el proceso de entrenamiento no es trivial, aunque es posible ver que este
+permite ajustar los pesos de la red neuronal de forma recursiva. Se toma un ejemplo de entrenamiento,
+se introduce por la capa de entrada y se propaga hacia adelante a través de las capas ocultas hasta
+llegar a la capa de salida. En ella, se calcula el error de cada neurona de salida $o$ acorde al
+producto de la derivada de su función de activación por la diferencia entre la salida deseada y la
+salida obtenida, obteniendo así el valor $\delta_o^p$. Con ello, los pesos se actualizan de acuerdo
+a la Ecuación \ref{na_actualizacion_salida}. Luego, para cada neurona oculta $h$, se calcula su
+error como el producto de la derivada de su función de activación por la suma del producto de los
+errores de las neuronas de salida por los pesos que las conectan, obteniendo así $\delta_h^p$. Con
+ello, los pesos se actualizan de acuerdo a la Ecuación \ref{na_actualizacion_oculta_pesos}. Este
+proceso se repite iterativamente para cada ejemplo de entrenamiento, ajustando los pesos de la red
+neuronal hasta que se alcance algún criterio de parada.
+
+Este proceso presenta algunas limitaciones, como el desvanecimiento del gradiente cuando la red
+contiene muchas capas. Sin embargo, tampoco se profundizará en ellas debido a que no resulta
+relevante para el desarrollo del trabajo. De nuevo, hay extensa literatura sobre el tema; para más
+información, un artículo interesante a consultar es el de \textit{Pascanu et al.} relativo a este
+problema y el de la explosión del gradiente \cite{pascanu2013difficultytrainingrecurrentneural}.
+
+\subsection{Pruebas de conocimiento cero}
 
 
 \bibliographystyle{ieeetr}
