@@ -69,17 +69,18 @@ denominadas \textit{neuronas artificiales}, conectadas entre sí mediante \texti
 transmiten señales. Concretamente, estas señales se representan mediante \textit{números reales},
 donde cada uno de ellos simboliza la fuerza de la conexión, también conocida como \textit{peso}. Una
 red neuronal suele contener desde algunas decenas hasta miles o incluso millones de neuronas
-artificiales, organizadas en diferentes \textit{capas}. Las neuronas de cada capa se encuentran
-conectadas a las de la capa siguiente. Un ejemplo típico de red neuronal se muestra en la Figura
-\ref{fig:nn}, la cual está compuesta por una capa de entrada con $N_i$ neuronas, una capa de salida
-con $N_o$ neuronas y varias capas ocultas con $N_h$ neuronas. Cuando una red neuronal contiene
-una o más capas ocultas, se denomina \textit{red neuronal profunda}, siendo este el caso mostrado y,
-en general, el más común en la actualidad.
+artificiales, organizadas en diferentes \textit{capas}. En general, las neuronas de cada capa se
+encuentran conectadas a las de la capa siguiente, aunque hay diferentes tipos de arquitecturas con
+diferentes configuraciones de capas y conexiones. Un ejemplo típico de red neuronal se muestra en la
+Figura \ref{fig:nn}, la cual está compuesta por una capa de entrada con tres neuronas, una capa de
+salida con dos neuronas y dos capas ocultas con cinco neuronas. Cuando una red neuronal contiene dos
+o más capas ocultas, se denomina \textit{red neuronal profunda}, siendo este el caso mostrado y, en
+general, el más común en la actualidad.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.6\textwidth]{figs/nn.png}
-  \caption{Ejemplo de red neuronal artificial \cite{krose1996introduction}.}
+  \includegraphics[width=0.5\textwidth]{figs/dnn.png}
+  \caption{Ejemplo de red neuronal artificial.}
   \label{fig:nn}
 \end{figure}
 
@@ -292,10 +293,10 @@ proceso se repite iterativamente para cada ejemplo de entrenamiento, ajustando l
 neuronal hasta que se alcance algún criterio de parada.
 
 Este proceso presenta algunas limitaciones, como el desvanecimiento del gradiente cuando la red
-contiene muchas capas. Sin embargo, tampoco se profundizará en ellas debido a que no resulta
-relevante para el desarrollo del trabajo. De nuevo, hay extensa literatura sobre el tema; para más
-información, un artículo interesante a consultar es el de \textit{Pascanu et al.} relativo a este
-problema y el de la explosión del gradiente \cite{pascanu2013difficultytrainingrecurrentneural}.
+contiene muchas capas. Sin embargo, tampoco se profundizará en ellas debido a que no es relevante
+para el trabajo. De nuevo, hay extensa literatura sobre el tema; para más información, un artículo
+interesante a consultar es el de \textit{Pascanu et al.} relativo a este problema y el de la
+explosión del gradiente \cite{pascanu2013difficultytrainingrecurrentneural}.
 
 \subsection{Pruebas de conocimiento cero}
 
