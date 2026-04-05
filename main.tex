@@ -79,7 +79,7 @@ general, el más común en la actualidad.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\textwidth]{figs/dnn.png}
+  \includegraphics[width=0.6\textwidth]{figs/dnn.png}
   \caption{Ejemplo de red neuronal artificial.}
   \label{fig:nn}
 \end{figure}
@@ -113,18 +113,18 @@ al respecto
 pesar de ello, un aspecto importante a destacar es que es condición necesaria que la función de
 activación sea diferenciable o, al menos, diferenciable en casi todo punto, ya que esto será
 necesario en el proceso de entrenamiento, basado en la \textit{propagación hacia atrás} del error y
-el uso de algoritmos de optimización como el \textit{descenso de gradiente} \cite{krose1996introduction}.
+el uso de algoritmos de optimización como el \textit{descenso de gradiente}.
 
 \begin{figure}
   \centering
-  \begin{subfigure}[b]{0.45\textwidth}
+  \begin{subfigure}[b]{0.4\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figs/relu.png}
     \caption{Rectified Linear Unit (ReLU)}
     \label{fig:relu}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.45\textwidth}
+  \begin{subfigure}[b]{0.4\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figs/prelu.png}
     \caption{Parametric ReLU (PReLU)}
@@ -133,14 +133,14 @@ el uso de algoritmos de optimización como el \textit{descenso de gradiente} \ci
 
   \vspace{0.5cm}
 
-  \begin{subfigure}[b]{0.45\textwidth}
+  \begin{subfigure}[b]{0.4\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figs/logistic.png}
     \caption{Función logística}
     \label{fig:logistic}
   \end{subfigure}
   \hfill
-  \begin{subfigure}[b]{0.45\textwidth}
+  \begin{subfigure}[b]{0.4\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figs/tanh.png}
     \caption{Función tangente hiperbólica}
@@ -172,7 +172,7 @@ un conjunto de datos de entrenamiento, $\mathcal{X}$, este consiste en cuatro si
 \end{enumerate}
 Intuitivamente, es fácil ver que el entrenamiento no es más que un proceso iterativo de prueba y
 error, donde se ajustan los pesos de la red neuronal para que su salida converja a la salida deseada
-para cada ejemplo de entrenamiento. Matemáticamente, no es un proceso trivial. A continuación, se
+para cada ejemplo de entrenamiento. Matemáticamente, no es un proceso sencillo. A continuación, se
 presenta una explicación detallada de cómo se consigue actualizar los pesos de la red; sin embargo,
 al final de la sección se mostrará un resumen de todo el proceso, haciendo mención a las dos
 ecuaciones que lo rigen, pudiendo ser de utilidad para aquellos lectores que no deseen profundizar
@@ -299,6 +299,64 @@ interesante a consultar es el de \textit{Pascanu et al.} relativo a este problem
 explosión del gradiente \cite{pascanu2013difficultytrainingrecurrentneural}.
 
 \subsection{Pruebas de conocimiento cero}
+
+Las \textbf{pruebas de conocimiento cero} surgen ante la necesidad de demostrar la posesión de una
+determinada información sin revelar nada sobre ella, solamente la prueba de que se posee
+\cite{goldreich2001foundations}. Para motivar el concepto, \textit{Alicia} decide registrarse en una
+página web que le solicita que demuestre que es mayor de edad. ¿Cómo puede hacerlo revelando
+\textit{únicamente} su edad? La solución tradicional sería que Alicia indique su edad, pero esto
+genera un problema: ¿cómo puede la página web verificar que Alicia es realmente mayor de edad? En los
+últimos años se ha popularizado solicitar a los usuarios una fotografía de su documento de identidad,
+de forma que la página web sea capaz de verificar la autenticidad del documento y, por tanto, la edad
+del usuario. Sin embargo, esto también genera un problema: si el objetivo es demostrar que Alicia es
+mayor de edad, ¿qué necesidad hay de revelar su identidad completa? Es más, ¿existe alguna forma de
+demostrar que Alicia es mayor de edad sin revelar siquiera su edad?
+
+Las pruebas de conocimiento cero son pruebas que no revelan ningún tipo de información más allá de
+la veracidad de la afirmación que se desea demostrar.
+
+\subsubsection{Pruebas interactivas}
+
+Una primera pregunta que puede surgir es: ¿qué es exactamente una prueba? En el campo de las
+matemáticas y, más concretamente, en la \textit{teoría de la demostración}, una prueba es una
+secuencia de afirmaciones que han sido demostradas como verdaderas, los \textit{axiomas}, o que se
+derivan de otras afirmaciones verdaderas mediante \textit{reglas de inferencia}
+\cite{goldreich2001foundations}; en este sentido, una prueba es un objeto matemático que se puede
+verificar de forma eficiente. En otras áreas, una prueba es un proceso \textit{dinámico} basado en
+la interacción entre dos partes mediante el cual se establece la veracidad de una afirmación, donde
+la prueba tiene menor valor que las consecuencias que se derivan de ella.
+
+La interpretación dinámica del concepto de prueba es la más apropiada para pruebas dentro de protocolos
+criptográficos. En este contexto, una prueba es un \textit{protocolo interactivo} entre dos partes
+encargadas de llevar a cabo dos tareas computacionales diferentes: producir una prueba y verificarla.
+Estas partes se denominan \textbf{probadora} y \textbf{verificadora}. La \textit{probadora} es la que
+posee el conocimiento que se desea demostrar, mientras que la \textit{verificadora} es la que desea
+verificar la veracidad de la afirmación dada por la probadora.
+
+Cada una de las partes se representa mediante una \textbf{máquina de Turing interactiva}. Una máquina
+de este tipo es una máquina de Turing que cuenta con una cinta de entrada, una cinta aleatoria, una
+cinta de trabajo, una cinta de salida, dos cintas de comunicación para enviar ($w$) y recibir ($r$)
+mensajes y una cinta conmutadora de una sola casilla. Además, cuenta con un bit $\sigma \in \{0,1\}$
+denominado \textit{identidad}; si la cinta conmutadora tiene el mismo valor que el bit de identidad,
+se dice que la máquina está activa, mientras que, si no, se dice que está inactiva, lo que implica
+que su estado interno no cambia.
+
+Dos máquinas de Turing interactivas, $A$ y $B$, se consideran \textit{enlazadas} si tienen identidades
+opuestas, al tiempo que sus cintas de entrada y conmutadora coinciden y las cintas de comunicación
+$A_r$ y $A_w$ de $A$ coinciden con las cintas de comunicación $B_w$ y $B_r$ de $B$, respectivamente.
+De esta forma, se define el \textit{cálculo conjunto} de $A$ y $B$ sobre una entrada común $x$ como
+la secuencia de pares que representan el estado interno de cada máquina. En cada par, una máquina
+está activa y la otra inactiva, siendo el primer par la configuración inicial de ambas máquinas tras
+recibir la entrada $x$, con el contenido de su conmutadora igual a 0. Si una máquina se detiene mientras
+que su conmutadora es igual a su identidad, se dice que ambas se han detenido y, con ello, queda
+determinada la salida de ambas máquinas.
+
+
+\subsubsection{Propiedad de conocimiento cero}
+
+\subsubsection{SNARKs modernos y aritmetización}
+
+\subsubsection{Pruebas de conocimiento cero para aprendizaje automático}
 
 
 \bibliographystyle{ieeetr}
