@@ -317,7 +317,7 @@ la veracidad de la afirmación que se desea demostrar.
 
 \subsubsection{Pruebas interactivas}
 
-Una primera pregunta que puede surgir es: ¿qué es exactamente una prueba? En el campo de las
+Una primera pregunta que puede surgir es: ¿qué es exactamente una \textbf{prueba}? En el campo de las
 matemáticas y, más concretamente, en la \textit{teoría de la demostración}, una prueba es una
 secuencia de afirmaciones que han sido demostradas como verdaderas, los \textit{axiomas}, o que se
 derivan de otras afirmaciones verdaderas mediante \textit{reglas de inferencia}
@@ -329,27 +329,47 @@ la prueba tiene menor valor que las consecuencias que se derivan de ella.
 La interpretación dinámica del concepto de prueba es la más apropiada para pruebas dentro de protocolos
 criptográficos. En este contexto, una prueba es un \textit{protocolo interactivo} entre dos partes
 encargadas de llevar a cabo dos tareas computacionales diferentes: producir una prueba y verificarla.
-Estas partes se denominan \textbf{probadora} y \textbf{verificadora}. La \textit{probadora} es la que
-posee el conocimiento que se desea demostrar, mientras que la \textit{verificadora} es la que desea
-verificar la veracidad de la afirmación dada por la probadora.
+Estas partes se denominan \textbf{probadora} ($P$) y \textbf{verificadora} ($V$). La \textit{probadora}
+es la que posee el conocimiento que se desea demostrar, mientras que la \textit{verificadora} es la
+que desea verificar la veracidad de la afirmación dada por la probadora. Cada una de las partes se
+modela mediante una \textbf{máquina de Turing interactiva}. Así, la probadora $P$ afirma que una
+declaración es cierta y el objetivo de la verificadora $V$ es determinar si esa afirmación es veraz
+mediante un proceso de interrogación a $P$. Una característica importante de este modelo es que $P$
+puede tener un poder computacional ilimitado, mientras que $V$ es una máquina de Turing
+estrictamente acotada, operando en \textit{tiempo polinomial probabilístico} (TPP). Es decir,
+$V$ es una máquina de Turing que, además de ser capaz de finalizar su ejecución en un número de pasos
+acotado por un polinomio del tamaño de la entrada, también es capaz de utilizar aleatoriedad durante
+su ejecución.
 
-Cada una de las partes se representa mediante una \textbf{máquina de Turing interactiva}. Una máquina
-de este tipo es una máquina de Turing que cuenta con una cinta de entrada, una cinta aleatoria, una
-cinta de trabajo, una cinta de salida, dos cintas de comunicación para enviar ($w$) y recibir ($r$)
-mensajes y una cinta conmutadora de una sola casilla. Además, cuenta con un bit $\sigma \in \{0,1\}$
-denominado \textit{identidad}; si la cinta conmutadora tiene el mismo valor que el bit de identidad,
-se dice que la máquina está activa, mientras que, si no, se dice que está inactiva, lo que implica
-que su estado interno no cambia.
+El uso de la aleatoriedad por parte de la verificadora $V$ es crucial para garantizar la seguridad
+del protocolo. Si esta fuese una máquina completamente determinista, una probadora maliciosa podría
+predecir qué preguntas formulará $V$ durante el interrogatorio y preparar respuestas específicas para
+cada una de ellas, permitiéndole engañar a $V$ para que acepte afirmaciones falsas; una verificadora
+determinista haría que la utilidad del proceso de interacción fuese nula.
 
-Dos máquinas de Turing interactivas, $A$ y $B$, se consideran \textit{enlazadas} si tienen identidades
-opuestas, al tiempo que sus cintas de entrada y conmutadora coinciden y las cintas de comunicación
-$A_r$ y $A_w$ de $A$ coinciden con las cintas de comunicación $B_w$ y $B_r$ de $B$, respectivamente.
-De esta forma, se define el \textit{cálculo conjunto} de $A$ y $B$ sobre una entrada común $x$ como
-la secuencia de pares que representan el estado interno de cada máquina. En cada par, una máquina
-está activa y la otra inactiva, siendo el primer par la configuración inicial de ambas máquinas tras
-recibir la entrada $x$, con el contenido de su conmutadora igual a 0. Si una máquina se detiene mientras
-que su conmutadora es igual a su identidad, se dice que ambas se han detenido y, con ello, queda
-determinada la salida de ambas máquinas.
+Formalmente, un par de máquinas de Turing interactivas $\left(P, V\right)$ constituyen un
+\textbf{sistema de prueba interactivo} para un lenguaje $L$ si satisfacen las siguientes condiciones:
+\begin{itemize}
+  \item \textit{Completitud}: si la afirmación es verdadera, es decir, $x \in L$, entonces una
+        verificadora honesta $V$ aceptará la afirmación dada por una probadora honesta $P$ con alta
+        probabilidad, esto es,
+        \begin{equation}
+          \Pr[\langle P, V \rangle(x) = 1] \geq \frac{2}{3} \label{completitud}
+        \end{equation}
+  \item \textit{Solidez}: si la afirmación es falsa, $x \notin L$, entonces ninguna probadora
+        maliciosa $B$ podrá engañar a una verificadora honesta con una probabilidad significativa,
+        es decir,
+        \begin{equation}
+          \Pr[\langle B, V \rangle(x) = 1] \leq \frac{1}{3} \label{solidez}
+        \end{equation}
+\end{itemize}
+donde $\langle P, V \rangle(x) = 1$ denota el evento de que $V$ acepte la afirmación dada por $P$
+tras ejecutar el protocolo interactivo con entrada $x$. En otras palabras, un sistema de prueba
+interactivo para un lenguaje $L$ es un protocolo entre una probadora $P$ y una verificadora $V$ tal
+que, si la afirmación dada por $P$ es verdadera, $V$ la acepta con alta probabilidad, mientras que,
+si la afirmación es falsa, $V$ la rechaza con alta probabilidad. Resulta de interés destacar que
+la probabilidad de error en ambos casos puede ser reducida a valores arbitrariamente pequeños mediante
+la repetición del protocolo un número suficiente de veces.
 
 
 \subsubsection{Propiedad de conocimiento cero}
