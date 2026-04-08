@@ -175,8 +175,8 @@ error, donde se ajustan los pesos de la red neuronal para que su salida converja
 para cada ejemplo de entrenamiento. Matemáticamente, no es un proceso sencillo. A continuación, se
 presenta una explicación detallada de cómo se consigue actualizar los pesos de la red; sin embargo,
 al final de la sección se mostrará un resumen de todo el proceso, haciendo mención a las dos
-ecuaciones que lo rigen, pudiendo ser de utilidad para aquellos lectores que no deseen profundizar
-en los detalles matemáticos.
+ecuaciones que lo rigen, pudiendo ser de utilidad si no se desea profundizar en los detalles
+matemáticos.
 
 Se asume una red neuronal formada por una única capa y una única neurona de salida con función de
 activación lineal. En este caso, la salida viene dada por
@@ -268,12 +268,12 @@ la cadena, se obtiene
   - \sum_{o=1}^{N_o} \delta_o^p w_{ho}
   \label{na_error_oculto}
 \end{equation}
-Con ello, se obtiene
+y, con ello,
 \begin{equation}
   \delta_h^p = \mathcal{F}'(s_h^p) \sum_{o=1}^{N_o} \delta_o^p w_{ho}
   \label{na_actualizacion_oculta}
 \end{equation}
-y, por tanto, la regla de actualización de los pesos para cada neurona oculta $h$ viene dada por
+Por lo tanto, la regla de actualización de los pesos para cada neurona oculta $h$ viene dada por
 \begin{equation}
   \Delta_p w_{jh} = \eta \delta_h^p y_j^p = \eta \mathcal{F}'(s_h^p) (\sum_{o=1}^{N_o} \delta_o^p w_{ho}) y_j^p
   \label{na_actualizacion_oculta_pesos}
@@ -293,10 +293,10 @@ proceso se repite iterativamente para cada ejemplo de entrenamiento, ajustando l
 neuronal hasta que se alcance algún criterio de parada.
 
 Este proceso presenta algunas limitaciones, como el desvanecimiento del gradiente cuando la red
-contiene muchas capas. Sin embargo, tampoco se profundizará en ellas debido a que no es relevante
-para el trabajo. De nuevo, hay extensa literatura sobre el tema; para más información, un artículo
-interesante a consultar es el de \textit{Pascanu et al.} relativo a este problema y el de la
-explosión del gradiente \cite{pascanu2013difficultytrainingrecurrentneural}.
+es profunda y se utilizan determinadas funciones de activación. Sin embargo, tampoco se profundizará
+en ellas debido a que no es relevante para el trabajo. De nuevo, hay extensa literatura sobre el
+tema; para más información, un artículo interesante a consultar es el de \textit{Pascanu et al.}
+relativo a este problema y el de la explosión del gradiente \cite{pascanu2013difficultytrainingrecurrentneural}.
 
 \subsection{Pruebas de conocimiento cero}
 
@@ -371,8 +371,24 @@ si la afirmación es falsa, $V$ la rechaza con alta probabilidad. Resulta de int
 la probabilidad de error en ambos casos puede ser reducida a valores arbitrariamente pequeños mediante
 la repetición del protocolo un número suficiente de veces.
 
-
 \subsubsection{Propiedad de conocimiento cero}
+
+Una vez establecido el concepto de sistema de prueba interativo y por qué es necesario que la
+verificadora actúe de forma probabilística, el siguiente paso natural es abordar la
+\textbf{propiedad de conocimiento cero}, es decir, demostrar que una afirmación es verdadera sin
+revelar ningún tipo de información secreta que justifique su veracidad. Así, cabe preguntarse, ¿es
+posible formalizar matemáticamente la idea de que, durante el proceso de interacción, no se revela
+ningún tipo de información adicional sobre la probadora? Para formalizar esta idea, se introduce el
+paradigma de la \textbf{simulación} \cite{goldreich2001foundations}.
+
+El enfoque clásico de la teoría de la información, como el propuesto por \textit{Shannon}, mide la
+cantidad de información en términos de incertidumbre, es decir, en la cantidad de bits necesarios
+para describir un objeto o evento \cite{shannon1948mathematical}. Sin embargo, esto no es adecuado
+para la criptografía moderna, donde el conocimiento se mide en términos de complejidad computacional,
+es decir, en la cantidad de recursos computacionales necesarios para obtener cierta información
+\cite{goldreich2001foundations}. Según \textit{Goldreich}, una prueba no revela ningún conocimiento
+si todo lo que la verificadora puede calcular tras la interacción con la probadora, también lo podría
+haber calculado sin interactuar con ella.
 
 \subsubsection{SNARKs modernos y aritmetización}
 
