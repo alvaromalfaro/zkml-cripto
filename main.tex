@@ -38,12 +38,13 @@ Cero}
 
 
 % Fundamentos teóricos
-\section{Fundamentos teóricos}
+\section{Fundamentos teóricos} \label{fundamentos}
 En esta sección se presentan los conceptos teóricos necesarios para el desarrollo del trabajo,
 incluyendo una introducción a los modelos de aprendizaje automático, con un enfoque en las redes
 neuronales artificiales y, posteriormente, las pruebas de conocimiento cero.
 
-\subsection{Aprendizaje Automático}
+\subsection{Aprendizaje Automático} \label{aprendizaje_automatico}
+
 El \textbf{aprendizaje automático} es una rama de la inteligencia artificial centrada en conseguir
 que los ordenadores simulen la capacidad humana de \textit{aprender}, así como de buscar métodos que
 les permitan adquirir conocimientos y habilidades para mejorar su rendimiento ante determinadas
@@ -55,7 +56,7 @@ minutos en modelos simples y con conjuntos de datos pequeños, como sería el ca
 \textit{árbol de decisión}, u horas, días o incluso semanas en modelos complejos y con conjuntos de
 datos masivos, como es el caso de los \textit{grandes modelos de lenguaje}.
 
-\subsubsection{Redes neuronales artificiales}
+\subsubsection{Redes neuronales artificiales} \label{redes_neuronales}
 
 Si hay un modelo de aprendizaje automático que ha adquirido notoriedad en las últimas décadas, ese
 es el de las \textbf{redes neuronales artificiales}, incluyendo todas sus variantes. Desde una
@@ -181,24 +182,22 @@ para cada ejemplo de entrenamiento. Matemáticamente, no es un proceso sencillo.
 proceso no resulta relevante para el presente proyecto, una explicación formal y detallada del mismo
 se puede encontrar en el libro de \textit{Krose y Smagt} \cite{krose1996introduction}.
 
-\subsection{Pruebas de conocimiento cero}
+\subsection{Pruebas de conocimiento cero} \label{zk}
 
 Las \textbf{pruebas de conocimiento cero} surgen ante la necesidad de demostrar la posesión de una
 determinada información sin revelar nada sobre ella, solamente la prueba de que se posee
 \cite{goldreich2001foundations}. Para motivar el concepto, \textit{Alicia} decide registrarse en una
 página web que le solicita que demuestre que es mayor de edad. ¿Cómo puede hacerlo revelando
-\textit{únicamente} su edad? La solución tradicional sería que Alicia indique su edad, pero esto
-genera un problema: ¿cómo puede la página web verificar que Alicia es realmente mayor de edad? En los
-últimos años se ha popularizado solicitar a los usuarios una fotografía de su documento de identidad,
-de forma que la página web sea capaz de verificar la autenticidad del documento y, por tanto, la edad
-del usuario. Sin embargo, esto también genera un problema: si el objetivo es demostrar que Alicia es
-mayor de edad, ¿qué necesidad hay de revelar su identidad completa? Es más, ¿existe alguna forma de
-demostrar que Alicia es mayor de edad sin revelar siquiera su edad?
+\textit{únicamente} su edad? La solución tradicional sería que \textit{Alicia} indique su edad, pero
+esto genera un problema: ¿cómo puede la página web verificar que \textit{Alicia} es realmente mayor
+de edad? En los últimos años se ha popularizado solicitar a los usuarios una fotografía de su
+documento de identidad, de forma que la página web sea capaz de verificar la autenticidad del
+documento y, por tanto, la edad del usuario. Sin embargo, esto también genera un problema: si el
+objetivo es demostrar que \textit{Alicia} es mayor de edad, ¿qué necesidad hay de revelar su identidad
+completa? Es más, ¿existe alguna forma de probar que \textit{Alicia} es mayor de edad sin revelar
+siquiera su edad?
 
-Las pruebas de conocimiento cero son pruebas que no revelan ningún tipo de información más allá de
-la veracidad de la afirmación que se desea demostrar.
-
-\subsubsection{Pruebas interactivas}
+\subsubsection{Pruebas interactivas} \label{zk_pruebas_interactivas}
 
 Una primera pregunta que puede surgir es: ¿qué es exactamente una \textbf{prueba}? En el campo de las
 matemáticas y, más concretamente, en la \textit{teoría de la demostración}, una prueba es una
@@ -252,17 +251,17 @@ interactivo para un lenguaje $L$ es un protocolo entre una probadora $P$ y una v
 que, si la afirmación dada por $P$ es verdadera, $V$ la acepta con alta probabilidad, mientras que,
 si la afirmación es falsa, $V$ la rechaza con alta probabilidad. Resulta de interés destacar que
 la probabilidad de error en ambos casos puede ser reducida a valores arbitrariamente pequeños mediante
-la repetición del protocolo un número suficiente de veces.
+la \textit{repetición} del protocolo un número suficiente de veces.
 
-\subsubsection{Propiedad de conocimiento cero}
+\subsubsection{Propiedad de conocimiento cero} \label{zk_conocimiento_cero}
 
 Una vez establecido el concepto de sistema de prueba interativo y por qué es necesario que la
 verificadora actúe de forma probabilística, el siguiente paso natural es abordar la
 \textbf{propiedad de conocimiento cero}, es decir, demostrar que una afirmación es verdadera sin
 revelar ningún tipo de información secreta que justifique su veracidad. Así, cabe preguntarse, ¿es
 posible formalizar matemáticamente la idea de que, durante el proceso de interacción, no se revela
-ningún tipo de información adicional sobre la probadora? Para formalizar esta idea, se introduce el
-paradigma de la \textbf{simulación} \cite{goldreich2001foundations}.
+ningún tipo de información adicional sobre la probadora? Es necesario introducir el paradigma de la
+\textbf{simulación} \cite{goldreich2001foundations}.
 
 El enfoque clásico de la teoría de la información, como el propuesto por \textit{Shannon}, mide la
 cantidad de información en términos de incertidumbre \cite{shannon1948mathematical}. Sin embargo,
@@ -304,18 +303,17 @@ pero su utilidad práctica depende de los problemas específicos que se pueden r
 pruebas de conocimiento cero. \textit{Goldreich et al.} demostraron que cualquier lenguaje que pueda
 ser verificado en tiempo polinomial, es decir, cualquier lenguaje en la clase de complejidad $NP$,
 posee un sistema de prueba interactivo de conocimiento cero computacional, asumiendo la existencia
-de funciones de un solo sentido \cite{goldreich1991proofs}.
-
-También, resulta de interés recordar que cualquier problema perteneciente a la clase de complejidad
-$NP$ se puede reducir a un problema de satisfacibilidad de circuitos booleanos o aritméticos
-(\textit{CSAT}) en tiempo polinomial por el teorema de \textit{Cook-Levin}, puesto que \textit{CSAT}
-es un problema $NP$-completo \cite{cook1971complexity, levin1973universal}. Además, se recuerda, la
-inferencia en una red neuronal consiste en aplicar una serie de pesos precalculados a unos datos de
-entrada para obtener una salida, lo cual no deja de ser más que la aplicación de una secuencia de
-operaciones matemáticas deterministas. Demostrar que se ha ejecutado una red neuronal sobre una
-entrada específica es, por tanto, una declaración de tipo $NP$. El problema que surge ahora es,
-¿cómo se puede traducir la arquitectura de una red neuronal y su proceso de inferencia a un circuito
-aritmético? Para esto, será necesario realizar un proceso de \textbf{aritmetización}.
+de funciones de un solo sentido \cite{goldreich1991proofs}. También, resulta de interés recordar que
+cualquier problema perteneciente a la clase de complejidad $NP$ se puede reducir a un problema de
+satisfacibilidad de circuitos booleanos o aritméticos (\textit{CSAT}) en tiempo polinomial por el
+teorema de \textit{Cook-Levin}, puesto que \textit{CSAT} es un problema $NP$-completo
+\cite{cook1971complexity, levin1973universal}. Además, se recuerda, la inferencia en una red neuronal
+consiste en aplicar una serie de pesos precalculados a unos datos de entrada para obtener una salida,
+lo cual no deja de ser más que la aplicación de una secuencia de operaciones matemáticas deterministas.
+Demostrar que se ha ejecutado una red neuronal sobre una entrada específica es, por tanto, una
+declaración de tipo $NP$. El problema que surge ahora es, ¿cómo se puede traducir la arquitectura de
+una red neuronal y su proceso de inferencia a un circuito aritmético? Para esto, será necesario
+realizar un proceso de \textbf{aritmetización}.
 
 \subsubsection{SNARKs modernos y aritmetización}
 
