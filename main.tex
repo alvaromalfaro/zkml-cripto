@@ -117,14 +117,14 @@ el uso de algoritmos de optimización como el \textit{descenso de gradiente}.
 
 \begin{figure}
   \centering
-  \begin{subfigure}[b]{0.4\textwidth}
+  \begin{subfigure}[b]{0.35\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figs/relu.png}
     \caption{Rectified Linear Unit (ReLU)}
     \label{fig:relu}
   \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.4\textwidth}
+  \hspace{1cm}
+  \begin{subfigure}[b]{0.35\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figs/prelu.png}
     \caption{Parametric ReLU (PReLU)}
@@ -133,14 +133,14 @@ el uso de algoritmos de optimización como el \textit{descenso de gradiente}.
 
   \vspace{0.5cm}
 
-  \begin{subfigure}[b]{0.4\textwidth}
+  \begin{subfigure}[b]{0.35\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figs/logistic.png}
     \caption{Función logística}
     \label{fig:logistic}
   \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{0.4\textwidth}
+  \hspace{1cm}
+  \begin{subfigure}[b]{0.35\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figs/tanh.png}
     \caption{Función tangente hiperbólica}
@@ -382,13 +382,57 @@ ningún tipo de información adicional sobre la probadora? Para formalizar esta 
 paradigma de la \textbf{simulación} \cite{goldreich2001foundations}.
 
 El enfoque clásico de la teoría de la información, como el propuesto por \textit{Shannon}, mide la
-cantidad de información en términos de incertidumbre, es decir, en la cantidad de bits necesarios
-para describir un objeto o evento \cite{shannon1948mathematical}. Sin embargo, esto no es adecuado
-para la criptografía moderna, donde el conocimiento se mide en términos de complejidad computacional,
-es decir, en la cantidad de recursos computacionales necesarios para obtener cierta información
-\cite{goldreich2001foundations}. Según \textit{Goldreich}, una prueba no revela ningún conocimiento
-si todo lo que la verificadora puede calcular tras la interacción con la probadora, también lo podría
-haber calculado sin interactuar con ella.
+cantidad de información en términos de incertidumbre \cite{shannon1948mathematical}. Sin embargo,
+esto no es adecuado para la criptografía moderna, donde el conocimiento se mide en términos de
+complejidad computacional, es decir, en la cantidad de recursos computacionales necesarios para
+obtener cierta información \cite{goldreich2001foundations}. Según \textit{Goldreich}, una prueba no
+revela ningún conocimiento si todo lo que la verificadora puede calcular tras la interacción con la
+probadora, también lo podría haber calculado sin interactuar con ella.
+
+Formalmente, dado un sistema de prueba interactivo $\left(P, V\right)$ para un lenguaje $L$, se
+conoce como \textbf{vista} de una verificadora $V^*$ tras interactuar con una probadora $P$ con
+entrada $x$, denotada como $\text{vista}_{V^*}^P(x)$ a una variable aleatoria que incluye
+\begin{enumerate}
+  \item La entrada pública $x$.
+  \item La aleatoriedad interna generada por $V^*$.
+  \item Todas las respuestas dadas por $P$ durante la interacción con $V^*$.
+\end{enumerate}
+Con ello, se dice que el sistema de prueba interactivo $\left(P, V\right)$ tiene la propiedad de
+\textit{conocimiento cero} si para cualquier verificadora $V^*$ existe un algoritmo que opere en
+tiempo polinomial probabilístico $M^*$, denominado \textbf{simulador}, tal que $M^*$ es capaz de
+generar una transcripción, $M^*(x)$, que es indistinguible de la vista real $\text{vista}_{V^*}^P(x)$.
+Es decir, si la verificadora $V^*$ no puede distinguir entre una conversación real con la probadora
+$P$ y una conversación ficticia generada por el simulador $M^*$, entonces la interacción con $P$ no
+le ha proporcionado ningún conocimiento adicional que no tuviera ya. En otras palabras, no se ha
+revelado ningún conocimiento.
+
+Ahora bien, matemáticamente, ¿qué quiere decir que una cosa sea indistinguible de otra? Esta
+pregunta permite introducir dos niveles de seguridad en la propiedad de conocimiento cero:
+\textbf{perfecto} y \textbf{computacional}. El \textit{conocimiento cero perfecto} se refiere a que
+la transcripción generada por el simulador, $M^*(x)$, sigue una distribución de probabilidad idéntica
+a la vista real $\text{vista}_{V^*}^P(x)$. En cambio, el \textit{conocimiento cero computacional} se
+produce cuando la transcripción generada por el simulador, $M^*(x)$, es computacionalmente indistinguible
+de la vista real $\text{vista}_{V^*}^P(x)$, es decir, que aunque las distribuciones de probabilidad
+no sean idénticas, ningún algoritmo limitado a tiempo polinomial probabilístico puede distinguir
+entre ambos con una probabilidad mayor a un límite despreciable.
+
+Esta definición de conocimiento cero y el paradigma de la simulación proporcionan una base sólida,
+pero su utilidad práctica depende de los problemas específicos que se pueden resolver mediante
+pruebas de conocimiento cero. \textit{Goldreich et al.} demostraron que cualquier lenguaje que pueda
+ser verificado en tiempo polinomial, es decir, cualquier lenguaje en la clase de complejidad $NP$,
+posee un sistema de prueba interactivo de conocimiento cero computacional, asumiendo la existencia
+de funciones de un solo sentido \cite{goldreich1991proofs}.
+
+Resulta de interés recordar que cualquier problema perteneciente a la clase de complejidad $NP$ se
+puede reducir a un problema de satisfacibilidad de circuitos booleanos o aritméticos (\textit{CSAT})
+en tiempo polinomial por el teorema de \textit{Cook-Levin}, puesto que \textit{CSAT} es un problema
+$NP$-completo \cite{cook1971complexity, levin1973universal}. Además, se recuerda, la inferencia en
+una red neuronal consiste en aplicar una serie de pesos precalculados a unos datos de entrada para
+obtener una salida, lo cual no deja de ser más que la aplicación de una secuencia de operaciones
+matemáticas deterministas. Demostrar que se ha ejecutado una red neuronal sobre una entrada específica
+es, por tanto, una declaración de tipo $NP$. El problema que surge ahora es, ¿cómo se puede traducir
+la arquitectura de una red neuronal y su proceso de inferencia a un circuito aritmético? Para esto,
+será necesario realizar un proceso de \textbf{aritmetización}.
 
 \subsubsection{SNARKs modernos y aritmetización}
 
