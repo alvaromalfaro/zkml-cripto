@@ -31,7 +31,6 @@ Cero}
 %% Resumen
 \begin{abstract}
   % TODO: escribir resumen.
-
 \end{abstract}
 
 % Introducción
@@ -85,9 +84,10 @@ general, el más común en la actualidad.
 
 \subsubsection{Inferencia en una red neuronal artificial}
 
-En cada neurona, se realiza una suma ponderada de las señales recibidas a través de sus enlaces. Así,
-en una cierta neurona $k$, la entrada total que recibe en un instante de tiempo $t$ viene
-dada por
+En una red neuronal artificial, el proceso de \textbf{inferencia} se refiere a la generación de una
+salida a partir de una entrada dada, utilizando los pesos de los enlaces entre las neuronas. En cada
+neurona, se realiza una suma ponderada de las señales recibidas a través de sus enlaces. Así, en una
+cierta neurona $k$, la entrada total que recibe en un instante de tiempo $t$ viene dada por
 \begin{equation}
   s_k(t) = \sum_{j} w_{jk}(t) y_j(t) + \theta_k(t) \label{na_entrada_total}
 \end{equation}
@@ -115,6 +115,10 @@ pesar de ello, un aspecto importante a destacar es que es condición necesaria q
 activación sea diferenciable o, al menos, diferenciable en casi todo punto, ya que esto será
 necesario en el proceso de entrenamiento, basado en la \textit{propagación hacia atrás} del error y
 el uso de algoritmos de optimización como el \textit{descenso de gradiente}.
+
+Este proceso de suma ponderada seguido de la aplicación de una función de activación se aplica en
+cada neurona de la red neuronal, desde la capa de entrada hasta la capa de salida, para generar la
+salida final de la red; se \textit{infiere} un resultado a partir de la entrada.
 
 \begin{figure}
   \centering
@@ -302,16 +306,16 @@ ser verificado en tiempo polinomial, es decir, cualquier lenguaje en la clase de
 posee un sistema de prueba interactivo de conocimiento cero computacional, asumiendo la existencia
 de funciones de un solo sentido \cite{goldreich1991proofs}.
 
-Resulta de interés recordar que cualquier problema perteneciente a la clase de complejidad $NP$ se
-puede reducir a un problema de satisfacibilidad de circuitos booleanos o aritméticos (\textit{CSAT})
-en tiempo polinomial por el teorema de \textit{Cook-Levin}, puesto que \textit{CSAT} es un problema
-$NP$-completo \cite{cook1971complexity, levin1973universal}. Además, se recuerda, la inferencia en
-una red neuronal consiste en aplicar una serie de pesos precalculados a unos datos de entrada para
-obtener una salida, lo cual no deja de ser más que la aplicación de una secuencia de operaciones
-matemáticas deterministas. Demostrar que se ha ejecutado una red neuronal sobre una entrada específica
-es, por tanto, una declaración de tipo $NP$. El problema que surge ahora es, ¿cómo se puede traducir
-la arquitectura de una red neuronal y su proceso de inferencia a un circuito aritmético? Para esto,
-será necesario realizar un proceso de \textbf{aritmetización}.
+También, resulta de interés recordar que cualquier problema perteneciente a la clase de complejidad
+$NP$ se puede reducir a un problema de satisfacibilidad de circuitos booleanos o aritméticos
+(\textit{CSAT}) en tiempo polinomial por el teorema de \textit{Cook-Levin}, puesto que \textit{CSAT}
+es un problema $NP$-completo \cite{cook1971complexity, levin1973universal}. Además, se recuerda, la
+inferencia en una red neuronal consiste en aplicar una serie de pesos precalculados a unos datos de
+entrada para obtener una salida, lo cual no deja de ser más que la aplicación de una secuencia de
+operaciones matemáticas deterministas. Demostrar que se ha ejecutado una red neuronal sobre una
+entrada específica es, por tanto, una declaración de tipo $NP$. El problema que surge ahora es,
+¿cómo se puede traducir la arquitectura de una red neuronal y su proceso de inferencia a un circuito
+aritmético? Para esto, será necesario realizar un proceso de \textbf{aritmetización}.
 
 \subsubsection{SNARKs modernos y aritmetización}
 
