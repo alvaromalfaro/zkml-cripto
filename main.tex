@@ -105,14 +105,13 @@ para generar su salida, tal que
   y_k(t+1) = \mathcal{F}(s_k(t)) \label{na_activacion}
 \end{equation}
 En general, $\mathcal{F}$ suele ser una función no lineal debido a que esto es lo que permite a las
-redes neuronales aprender patrones complejos en los datos. Algunas de las funciones de activación
-más utilizadas se muestran en la Figura \ref{fig:funciones_activacion}. Sin embargo, no se
-profundizará en ellas debido a que no resulta especialmente relevante para el desarrollo del trabajo.
-Hay extensa literatura sobre el tema, por lo que una simple búsqueda de artículos o libros sobre
-redes neuronales artificiales o aprendizaje profundo proporcionará una gran cantidad de información
-al respecto
+redes neuronales aprender patrones complejos en los datos. Hay multitud de funciones de activación,
+sin embargo, no se profundizará en ellas debido a que no resulta especialmente relevante para el
+desarrollo del trabajo. Hay extensa literatura sobre el tema, por lo que una simple búsqueda de
+artículos o libros sobre redes neuronales artificiales o aprendizaje profundo proporcionará una gran
+cantidad de información al respecto
 \cite{kunc2024decadesactivationscomprehensivesurvey,dubey2022activationfunctionsdeeplearning}. A
-pesar de ello, un aspecto importante a destacar es que es condición necesaria que la función de
+pesar de ello, un aspecto interesante a destacar es que es condición necesaria que la función de
 activación sea diferenciable o, al menos, diferenciable en casi todo punto, ya que esto será
 necesario en el proceso de entrenamiento, basado en la \textit{propagación hacia atrás} del error y
 el uso de algoritmos de optimización como el \textit{descenso de gradiente}.
@@ -120,42 +119,6 @@ el uso de algoritmos de optimización como el \textit{descenso de gradiente}.
 Este proceso de suma ponderada seguido de la aplicación de una función de activación se aplica en
 cada neurona de la red neuronal, desde la capa de entrada hasta la capa de salida, para generar la
 salida final de la red; se \textit{infiere} un resultado a partir de la entrada.
-
-\begin{figure}
-  \centering
-  \begin{subfigure}[b]{0.35\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figs/relu.png}
-    \caption{Rectified Linear Unit (ReLU)}
-    \label{fig:relu}
-  \end{subfigure}
-  \hspace{1cm}
-  \begin{subfigure}[b]{0.35\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figs/prelu.png}
-    \caption{Parametric ReLU (PReLU)}
-    \label{fig:prelu}
-  \end{subfigure}
-
-  \vspace{0.5cm}
-
-  \begin{subfigure}[b]{0.35\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figs/logistic.png}
-    \caption{Función logística}
-    \label{fig:logistic}
-  \end{subfigure}
-  \hspace{1cm}
-  \begin{subfigure}[b]{0.35\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{figs/tanh.png}
-    \caption{Función tangente hiperbólica}
-    \label{fig:tanh}
-  \end{subfigure}
-
-  \caption{Funciones de activación en redes neuronales.}
-  \label{fig:funciones_activacion}
-\end{figure}
 
 
 \subsubsection{Entrenamiento en una red neuronal artificial}
