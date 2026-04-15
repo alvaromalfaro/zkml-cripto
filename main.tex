@@ -276,9 +276,42 @@ lo cual no deja de ser más que la aplicación de una secuencia de operaciones m
 Demostrar que se ha ejecutado una red neuronal sobre una entrada específica es, por tanto, una
 declaración de tipo $NP$. El problema que surge ahora es, ¿cómo se puede traducir la arquitectura de
 una red neuronal y su proceso de inferencia a un circuito aritmético? Para esto, será necesario
-realizar un proceso de \textbf{aritmetización}.
+realizar un proceso de \textit{aritmetización}.
 
-\subsubsection{SNARKs modernos y aritmetización}
+\subsubsection{SNARKs y aritmetización}
+
+Ya se ha establecido que es teóricamente posible demostrar la correcta ejecución de cualquier programa,
+incluyendo modelos de aprendizaje automático, ocultando sus secretos mediante sistemas de prueba
+interactivos. Sin embargo, para que esto sea viable en la práctica, el modelo tradicional presenta
+serias limitaciones, principalmente en términos de eficiencia.
+
+Para superar estas limitaciones, la criptografía moderna ha evolucionado hacia la construcción de
+\textbf{sistemas de prueba no interactivos}, conocidos como \textbf{SNARKs} (por sus siglas en inglés:
+\textit{Succint Non-interactive Arguments of Knowledge}) \cite{thaler2022proofs}. Se hace necesario
+desglosar el acrónimo para entender su significado y las propiedades que se exigirán a un sistema de
+prueba para modelos de aprendizaje automático. En primer lugar, un sistema de prueba es \textit{sucinto}
+si el tamaño de la prueba generada por la probadora $P$ es pequeño y el tiempo que tarda la verificadora
+$V$ en comprobarla es del orden de milisegundos, independientemente del tamaño y complejidad del
+programa que se está demostrando. Es fácil ver que esta propiedad es clave para la escalabilidad. En
+segundo lugar, un sistema de prueba es \textit{no interactivo} si no hay un interrogatorio de ida y
+vuelta; la probadora genera un único mensaje de prueba y lo envía a la verificadora. Para lograr esto,
+se suele hacer uso de la \textit{heurística de Fiat-Shamir}, que emplea funciones \textit{hash}
+criptográficas para generar desafíos pseudoaleatorios de forma no interactiva \cite{fiat1987how}. Por
+otra parte, existe una distinción técnica entre \textit{argumento} y \textit{prueba}; la prueba tiene
+solidez estadística, protegiendo contra probadoras maliciosas que puedan tener poder de cómputo ilimitado,
+mientras que el argumento solo tiene solidez computacional, es decir, un \textit{SNARK} asume que la
+probadora maliciosa está limitada a tiempo polinomial \cite{thaler2022proofs}. Finalmente,
+\textit{conocimiento} se refiere a que no solo debe garantizarse que la afirmación es cierta, sino
+también que la probadora posee la información o testigo que hace la afirmación cierta.
+
+Cuando a un \textit{SNARK} se le exige ocultar el testigo, es decir, la información secreta que
+justifica la veracidad de la afirmación, se le denomina \textbf{zk-SNARK} \cite{thaler2022proofs},
+la propiedad de \textit{conocimiento cero} que se introdujo previamente. Para construir un
+\textit{zk-SNARK} de un modelo de aprendizaje automático, el primer inconveniente que surge es que
+un protocolo criptográfico no entiende de neuronas, capas o pesos de números reales; operan
+evaluando polinomios sobre campos finitos $\mathbb{F}_p$. Por tanto, como se ha comentado, es
+necesario traducir la arquitectura a un conjunto de restricciones polinomiales; el proceso de
+\textit{aritmetización} que ya se ha mencionado.
 
 \subsubsection{Pruebas de conocimiento cero para aprendizaje automático}
 
