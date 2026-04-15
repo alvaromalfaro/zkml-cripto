@@ -8,10 +8,11 @@
 \singlespacing
 \usepackage{textcomp,marvosym,pifont}
 \usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
-\usepackage{amsmath, amsthm, amsfonts}
+\usepackage{amsmath, amsthm, amsfonts, amssymb}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{todonotes}
 \setlength{\parskip}{1.5mm}
 
 \title{Inferencia verificable en modelos de Aprendizaje Automático mediante Pruebas de Conocimiento
@@ -39,11 +40,9 @@ Cero}
 
 % Fundamentos teóricos
 \section{Fundamentos teóricos} \label{fundamentos}
-En esta sección se presentan los conceptos teóricos necesarios para el desarrollo del trabajo,
-incluyendo una introducción a los modelos de aprendizaje automático, con un enfoque en las redes
-neuronales artificiales y, posteriormente, las pruebas de conocimiento cero.
 
-\subsection{Aprendizaje Automático} \label{aprendizaje_automatico}
+
+\subsection{Una aproximación al aprendizaje automático} \label{aprendizaje_automatico}
 
 El \textbf{aprendizaje automático} es una rama de la inteligencia artificial centrada en conseguir
 que los ordenadores simulen la capacidad humana de \textit{aprender}, así como de buscar métodos que
@@ -56,7 +55,7 @@ minutos en modelos simples y con conjuntos de datos pequeños, como sería el ca
 \textit{árbol de decisión}, u horas, días o incluso semanas en modelos complejos y con conjuntos de
 datos masivos, como es el caso de los \textit{grandes modelos de lenguaje}.
 
-\subsubsection{Redes neuronales artificiales} \label{redes_neuronales}
+\subsubsection{Redes neuronales artificiales, aprendizaje e inferencia} \label{redes_neuronales}
 
 Si hay un modelo de aprendizaje automático que ha adquirido notoriedad en las últimas décadas, ese
 es el de las \textbf{redes neuronales artificiales}, incluyendo todas sus variantes. Desde una
@@ -82,8 +81,6 @@ general, el más común en la actualidad.
   \caption{Ejemplo de red neuronal artificial.}
   \label{fig:nn}
 \end{figure}
-
-\subsubsection{Inferencia en una red neuronal artificial}
 
 En una red neuronal artificial, el proceso de \textbf{inferencia} se refiere a la generación de una
 salida a partir de una entrada dada, utilizando los pesos de los enlaces entre las neuronas. En cada
@@ -119,9 +116,6 @@ el uso de algoritmos de optimización como el \textit{descenso de gradiente}.
 Este proceso de suma ponderada seguido de la aplicación de una función de activación se aplica en
 cada neurona de la red neuronal, desde la capa de entrada hasta la capa de salida, para generar la
 salida final de la red; se \textit{infiere} un resultado a partir de la entrada.
-
-
-\subsubsection{Entrenamiento en una red neuronal artificial}
 
 Llegados a este punto, se habrá observado que no se ha hecho mención alguna a cómo se determinan los
 pesos de los enlaces. Esto se debe a que, en general, no se establecen manualmente, más allá de una
@@ -275,8 +269,9 @@ consiste en aplicar una serie de pesos precalculados a unos datos de entrada par
 lo cual no deja de ser más que la aplicación de una secuencia de operaciones matemáticas deterministas.
 Demostrar que se ha ejecutado una red neuronal sobre una entrada específica es, por tanto, una
 declaración de tipo $NP$. El problema que surge ahora es, ¿cómo se puede traducir la arquitectura de
-una red neuronal y su proceso de inferencia a un circuito aritmético? Para esto, será necesario
-realizar un proceso de \textit{aritmetización}.
+una red neuronal y su proceso de inferencia a un circuito aritmético?
+
+\subsection{Pruebas de conocimiento cero para modelos de aprendizaje automático}
 
 \subsubsection{SNARKs y aritmetización}
 
@@ -304,17 +299,76 @@ probadora maliciosa está limitada a tiempo polinomial \cite{thaler2022proofs}. 
 \textit{conocimiento} se refiere a que no solo debe garantizarse que la afirmación es cierta, sino
 también que la probadora posee la información o testigo que hace la afirmación cierta.
 
-Cuando a un \textit{SNARK} se le exige ocultar el testigo, es decir, la información secreta que
-justifica la veracidad de la afirmación, se le denomina \textbf{zk-SNARK} \cite{thaler2022proofs},
-la propiedad de \textit{conocimiento cero} que se introdujo previamente. Para construir un
-\textit{zk-SNARK} de un modelo de aprendizaje automático, el primer inconveniente que surge es que
-un protocolo criptográfico no entiende de neuronas, capas o pesos de números reales; operan
-evaluando polinomios sobre campos finitos $\mathbb{F}_p$. Por tanto, como se ha comentado, es
-necesario traducir la arquitectura a un conjunto de restricciones polinomiales; el proceso de
-\textit{aritmetización} que ya se ha mencionado.
+Cuando a un \textit{SNARK} se le exige ocultar el \textit{testigo}, es decir, la información secreta
+que justifica la veracidad de la afirmación, se le denomina \textbf{zk-SNARK} \cite{thaler2022proofs}.
+Como se puede observar, esto es la propiedad de \textit{conocimiento cero} introducida en la Sección
+\ref{zk_conocimiento_cero}. Así, para construir un \textit{zk-SNARK} de un modelo de aprendizaje
+automático, el primer inconveniente que surge es que un protocolo criptográfico no entiende de neuronas,
+capas o pesos; operan evaluando polinomios sobre campos finitos $\mathbb{F}_p$. Por tanto, es
+necesario traducir la aquitectura de la red neuronal a un conjunto de restricciones polinomiales
+mediante un proceso de \textbf{aritmetización}.
 
-\subsubsection{Pruebas de conocimiento cero para aprendizaje automático}
+El estándar para representar circuitos aritméticos es el \textbf{Sistema de restricciones de Rango 1}
+(\textit{R1CS}, por sus siglas en inglés: \textit{Rank-1 Constraint System}) \cite{thaler2022proofs}.
+En un sistema R1CS, el cálculo completo de un programa se representa mediante un conjunto de restricciones
+polinomiales en forma de sistema de matrices, tal que
+\begin{equation}
+  (A \cdot z) \circ (B \cdot z) = C \cdot z \label{r1cs}
+\end{equation}
+donde $A$, $B$ y $C$ son matrices de coeficientes que codifican la \textit{topología} del circuito
+matemático, con dimensiones $m \times n$, donde $m$ es el número de restricciones (puertas lógicas o
+aritméticas) y $n$ es la longitud del vector de variables $z$. Este vector, denominado \textit{testigo},
+contiene todas las variables del sistema, esto es, las entradas públicas (los datos), las entradas
+privadas (los pesos), todas las variables intermedias generadas durante el cálculo y la constante 1
+en la primera posición. Finalmente, el símbolo $\circ$ denota el producto de \textit{Hadamard}, es
+decir, la multiplicación elemento a elemento de los vectores resultantes.
 
+Para ilustrar cómo se aplica este sistema matricial a una operación fundamental del aprendizaje
+automático, se considera el cálculo de una única neurona lineal simple, donde una entrada $x$ se
+multiplica por un peso $w$ para generar una salida $y$, es decir, se debe probar que $y = w \cdot x$.
+El primer paso es definir el vector testigo $z$ con todas las variables involucradas junto con la
+constante, de forma que $z = [1, y, x, w]^{\intercal}$. A continuación, se deben establecer las
+matrices $A$, $B$ y $C$ con el objetivo de aislar los operandos correspondientes. Para la ecuación
+propuesta, se establecen como sigue:
+\begin{align*}
+  A & = \begin{bmatrix} 0 & 0 & 1 & 0 \end{bmatrix} \\
+  B & = \begin{bmatrix} 0 & 0 & 0 & 1 \end{bmatrix} \\
+  C & = \begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix}
+\end{align*}
+Con ello, al evaluar el sistema, se obtiene $A \cdot z = x$, $B \cdot z = w$ y $C \cdot z = y$, de modo
+que la Ecuación \ref{r1cs} se evalúa exactamente como la restricción que se desea probar, es decir,
+$x \cdot w = y$. La inferencia de una red neuronal completa, con múltiples capas y miles o millones
+de neuronas, no es más que la concatenación de miles de estas restricciones, añadiendo nuevas variables
+intermedias al vector testigo por cada operación elemental realizada. \todo{Explicar el papel de la constante 1 en el vector testigo.}
+
+Una vez construido el sistema R1CS, los protocolos modernos interpolan estas matrices para generar un
+conjunto de polinomios en un formato conocido como \textbf{Programas Aritméticos Cuadráticos}
+(\textit{QAP}, por sus siglas en inglés: \textit{Quadratic Arithmetic Programs}) \cite{gennaro2013quadratic}.
+Esta transformación es el paso final para que un sistema \textit{zk-SNARK} pueda generar pruebas
+sucintas. El objetivo de \textit{QAP} es condensar el sistema de restricciones en un conjunto de
+polinomios utilizando técnicas de interpolación polinómica, normalmente interpolación de
+\textit{Lagrange}, de forma que la validez de todo el circuito se reduce a verificar una única
+identidad polinómica:
+\begin{equation}
+  A(x) \cdot B(x) - C(x) = H(x) \cdot Z(x) \label{qap}
+\end{equation}
+donde $A(x)$, $B(x)$ y $C(x)$ son polinomios que representan los operandos izquierdo, derecho y la
+salida en el vector testigo, respectivamente. $Z(x)$ es un polinomio que se anula en las raíces
+correspondientes a cada puerta lógica y $H(x)$ es el polinomio cociente generado por la probadora
+para demostrar que $A \cdot B - C$ es divisible por $Z(x)$. Si la probadora ha ejecutado la red neuronal
+correctamente, entonces la identidad polinómica se cumple y la inferencia es válida \footnote{La notación $A(x)$,
+  $B(x)$ y $C(x)$ proviene del artículo de \textit{Vitalik Buterin} \cite{buterin2016qap}, creador
+  de \textit{Ethereum}, y se han escogido por equivalencia didáctica con las matrices del sistema R1CS.}.
+
+Al reducir todas las operaciones de la red neuronal a la verificación de la divisibilidad de un
+polinomio, la verificadora puede comprobar la validez de la prueba evaluando los polinomios en un
+único punto aleatorio, gracias al Lema de \textit{Schwartz-Zippel} \cite[Capítulo~4]{thaler2022proofs}.
+
+\todo{Modificar citas de libros para especificar capítulos.}
+
+\subsubsection{Cuantización y aritmética de punto fijo en $\mathbb{F}_p$}
+
+\subsubsection{Lidiando con la no linealidad}
 
 \bibliographystyle{ieeetr}
 \bibliography{refs}
