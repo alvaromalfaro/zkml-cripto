@@ -90,11 +90,11 @@ cierta neurona $k$, la entrada total que recibe en un instante de tiempo $t$ vie
   s_k(t) = \sum_{j} w_{jk}(t) y_j(t) + \theta_k(t) \label{na_entrada_total}
 \end{equation}
 donde $w_{jk}(t)$ representa el peso del enlace que conecta la neurona $j$ con la neurona $k$,
-siendo $j$, normalmente, una neurona de la capa anterior \cite{krose1996introduction}. Cuando el
-peso es positivo, se dice que el enlace es \textit{excitatorio}, mientras que, si es negativo, se
-dice que es \textit{inhibitorio}. Luego, $y_j(t)$ representa la señal de salida de la neurona $j$ y,
-finalmente, $\theta_k(t)$ representa el \textit{sesgo} de la neurona $k$, un valor constante que
-permite ajustar su umbral de activación.
+siendo $j$, normalmente, una neurona de la capa anterior \cite[Capítulo~2]{krose1996introduction}.
+Cuando el peso es positivo, se dice que el enlace es \textit{excitatorio}, mientras que, si es
+negativo, se dice que es \textit{inhibitorio}. Luego, $y_j(t)$ representa la señal de salida de la
+neurona $j$ y, finalmente, $\theta_k(t)$ representa el \textit{sesgo} de la neurona $k$, un valor
+constante que permite ajustar su umbral de activación.
 
 Tras ello, la neurona $k$ aplica una \textit{función de activación} a su entrada total, $s_k(t)$,
 para generar su salida, tal que
@@ -121,7 +121,7 @@ Llegados a este punto, se habrá observado que no se ha hecho mención alguna a 
 pesos de los enlaces. Esto se debe a que, en general, no se establecen manualmente, más allá de una
 inicialización aleatoria, sino que se aprenden mediante el proceso de \textit{entrenamiento}. Dado
 un conjunto de datos de entrenamiento, $\mathcal{X}$, este consiste en cuatro simples pasos
-\cite{krose1996introduction}:
+\cite[Capítulo~3]{krose1996introduction}:
 \begin{enumerate}
   \item Inicializar los pesos de la red neuronal de forma aleatoria.
   \item Seleccionar un ejemplo de entrenamiento $x \in \mathcal{X}$ e introducirlo por la capa de
@@ -137,22 +137,22 @@ Intuitivamente, es fácil ver que el entrenamiento no es más que un proceso ite
 error, donde se ajustan los pesos de la red neuronal para que su salida converja a la salida deseada
 para cada ejemplo de entrenamiento. Matemáticamente, no es un proceso sencillo. De nuevo, dado que el
 proceso no resulta relevante para el presente proyecto, una explicación formal y detallada del mismo
-se puede encontrar en el libro de \textit{Krose y Smagt} \cite{krose1996introduction}.
+se puede encontrar en el libro de \textit{Krose y Smagt} \cite[Capítulo~4]{krose1996introduction}.
 
 \subsection{Pruebas de conocimiento cero} \label{zk}
 
 Las \textbf{pruebas de conocimiento cero} surgen ante la necesidad de demostrar la posesión de una
 determinada información sin revelar nada sobre ella, solamente la prueba de que se posee
-\cite{goldreich2001foundations}. Para motivar el concepto, \textit{Alicia} decide registrarse en una
-página web que le solicita que demuestre que es mayor de edad. ¿Cómo puede hacerlo revelando
-\textit{únicamente} su edad? La solución tradicional sería que \textit{Alicia} indique su edad, pero
-esto genera un problema: ¿cómo puede la página web verificar que \textit{Alicia} es realmente mayor
-de edad? En los últimos años se ha popularizado solicitar a los usuarios una fotografía de su
-documento de identidad, de forma que la página web sea capaz de verificar la autenticidad del
-documento y, por tanto, la edad del usuario. Sin embargo, esto también genera un problema: si el
-objetivo es demostrar que \textit{Alicia} es mayor de edad, ¿qué necesidad hay de revelar su identidad
-completa? Es más, ¿existe alguna forma de probar que \textit{Alicia} es mayor de edad sin revelar
-siquiera su edad?
+\cite[Capítulo~4]{goldreich2001foundations}. Para motivar el concepto, \textit{Alicia} decide
+registrarse en una página web que le solicita que demuestre que es mayor de edad. ¿Cómo puede hacerlo
+revelando \textit{únicamente} su edad? La solución tradicional sería que \textit{Alicia} indique su
+edad, pero esto genera un problema: ¿cómo puede la página web verificar que \textit{Alicia} es
+realmente mayor de edad? En los últimos años se ha popularizado solicitar a los usuarios una
+fotografía de su documento de identidad, de forma que la página web sea capaz de verificar la
+autenticidad del documento y, por tanto, la edad del usuario. Sin embargo, esto también genera un
+problema: si el objetivo es demostrar que \textit{Alicia} es mayor de edad, ¿qué necesidad hay de
+revelar su identidad completa? Es más, ¿existe alguna forma de probar que \textit{Alicia} es mayor de
+edad sin revelar siquiera su edad?
 
 \subsubsection{Pruebas interactivas} \label{zk_pruebas_interactivas}
 
@@ -160,10 +160,10 @@ Una primera pregunta que puede surgir es: ¿qué es exactamente una \textbf{prue
 matemáticas y, más concretamente, en la \textit{teoría de la demostración}, una prueba es una
 secuencia de afirmaciones que han sido demostradas como verdaderas, los \textit{axiomas}, o que se
 derivan de otras afirmaciones verdaderas mediante \textit{reglas de inferencia}
-\cite{goldreich2001foundations}; en este sentido, una prueba es un objeto matemático que se puede
-verificar de forma eficiente. En otras áreas, una prueba es un proceso \textit{dinámico} basado en
-la interacción entre dos partes mediante el cual se establece la veracidad de una afirmación, donde
-la prueba tiene menor valor que las consecuencias que se derivan de ella.
+\cite[Capítulo~4]{goldreich2001foundations}; en este sentido, una prueba es un objeto matemático que
+se puede verificar de forma eficiente. En otras áreas, una prueba es un proceso \textit{dinámico}
+basado en la interacción entre dos partes mediante el cual se establece la veracidad de una afirmación,
+donde la prueba tiene menor valor que las consecuencias que se derivan de ella.
 
 La interpretación dinámica del concepto de prueba es la más apropiada para pruebas dentro de protocolos
 criptográficos. En este contexto, una prueba es un \textit{protocolo interactivo} entre dos partes
@@ -218,15 +218,15 @@ verificadora actúe de forma probabilística, el siguiente paso natural es abord
 revelar ningún tipo de información secreta que justifique su veracidad. Así, cabe preguntarse, ¿es
 posible formalizar matemáticamente la idea de que, durante el proceso de interacción, no se revela
 ningún tipo de información adicional sobre la probadora? Es necesario introducir el paradigma de la
-\textbf{simulación} \cite{goldreich2001foundations}.
+\textbf{simulación} \cite[Capítulo~4]{goldreich2001foundations}.
 
 El enfoque clásico de la teoría de la información, como el propuesto por \textit{Shannon}, mide la
 cantidad de información en términos de incertidumbre \cite{shannon1948mathematical}. Sin embargo,
 esto no es adecuado para la criptografía moderna, donde el conocimiento se mide en términos de
 complejidad computacional, es decir, en la cantidad de recursos computacionales necesarios para
-obtener cierta información \cite{goldreich2001foundations}. Según \textit{Goldreich}, una prueba no
-revela ningún conocimiento si todo lo que la verificadora puede calcular tras la interacción con la
-probadora, también lo podría haber calculado sin interactuar con ella.
+obtener cierta información. Según \textit{Goldreich}, una prueba no revela ningún conocimiento si
+todo lo que la verificadora puede calcular tras la interacción con la probadora, también lo podría
+haber calculado sin interactuar con ella \cite[Capítulo~4]{goldreich2001foundations}.
 
 Formalmente, dado un sistema de prueba interactivo $\left(P, V\right)$ para un lenguaje $L$, se
 conoce como \textbf{vista} de una verificadora $V^*$ tras interactuar con una probadora $P$ con
@@ -242,18 +242,19 @@ tiempo polinomial probabilístico $M^*$, denominado \textbf{simulador}, tal que 
 generar una transcripción, $M^*(x)$, que es indistinguible de la vista real $\text{vista}_{V^*}^P(x)$.
 Es decir, si la verificadora $V^*$ no puede distinguir entre una conversación real con la probadora
 $P$ y una conversación ficticia generada por el simulador $M^*$, entonces la interacción con $P$ no
-le ha proporcionado ningún conocimiento adicional que no tuviera ya. En otras palabras, no se ha
-revelado ningún conocimiento.
+le ha proporcionado ningún conocimiento adicional que no tuviera ya; no se ha revelado ningún
+conocimiento.
 
 Ahora bien, matemáticamente, ¿qué quiere decir que una cosa sea indistinguible de otra? Esta
 pregunta permite introducir dos niveles de seguridad en la propiedad de conocimiento cero:
-\textbf{perfecto} y \textbf{computacional}. El \textit{conocimiento cero perfecto} se refiere a que
-la transcripción generada por el simulador, $M^*(x)$, sigue una distribución de probabilidad idéntica
-a la vista real $\text{vista}_{V^*}^P(x)$. En cambio, el \textit{conocimiento cero computacional} se
-produce cuando la transcripción generada por el simulador, $M^*(x)$, es computacionalmente indistinguible
-de la vista real $\text{vista}_{V^*}^P(x)$, es decir, que aunque las distribuciones de probabilidad
-no sean idénticas, ningún algoritmo limitado a tiempo polinomial probabilístico puede distinguir
-entre ambos con una probabilidad mayor a un límite despreciable.
+\textbf{perfecto} y \textbf{computacional} \cite[Capítulo~4]{goldreich2001foundations}. El
+\textit{conocimiento cero perfecto} se refiere a que la transcripción generada por el simulador,
+$M^*(x)$, sigue una distribución de probabilidad idéntica a la vista real $\text{vista}_{V^*}^P(x)$.
+En cambio, el \textit{conocimiento cero computacional} se produce cuando la transcripción generada
+por el simulador, $M^*(x)$, es computacionalmente indistinguible de la vista real
+$\text{vista}_{V^*}^P(x)$, es decir, que aunque las distribuciones de probabilidad no sean idénticas,
+ningún algoritmo limitado a tiempo polinomial probabilístico puede distinguir entre ambos con una
+probabilidad mayor a un límite despreciable.
 
 Esta definición de conocimiento cero y el paradigma de la simulación proporcionan una base sólida,
 pero su utilidad práctica depende de los problemas específicos que se pueden resolver mediante
@@ -282,25 +283,26 @@ serias limitaciones, principalmente en términos de eficiencia.
 
 Para superar estas limitaciones, la criptografía moderna ha evolucionado hacia la construcción de
 \textbf{sistemas de prueba no interactivos}, conocidos como \textbf{SNARKs} (por sus siglas en inglés:
-\textit{Succinct Non-interactive Arguments of Knowledge}) \cite{thaler2022proofs}. Se hace necesario
-desglosar el acrónimo para entender su significado y las propiedades que se exigirán a un sistema de
-prueba para modelos de aprendizaje automático. En primer lugar, un sistema de prueba es \textit{sucinto}
-si el tamaño de la prueba generada por la probadora $P$ es pequeño y el tiempo que tarda la verificadora
-$V$ en comprobarla es del orden de milisegundos, independientemente del tamaño y complejidad del
-programa que se está demostrando. Es fácil ver que esta propiedad es clave para la escalabilidad. En
-segundo lugar, un sistema de prueba es \textit{no interactivo} si no hay un interrogatorio de ida y
-vuelta; la probadora genera un único mensaje de prueba y lo envía a la verificadora. Para lograr esto,
-se suele hacer uso de la \textit{heurística de Fiat-Shamir}, que emplea funciones \textit{hash}
-criptográficas para generar desafíos pseudoaleatorios de forma no interactiva \cite{fiat1987how}. Por
-otra parte, existe una distinción técnica entre \textit{argumento} y \textit{prueba}; la prueba tiene
-solidez estadística, protegiendo contra probadoras maliciosas que puedan tener poder de cómputo ilimitado,
-mientras que el argumento solo tiene solidez computacional, es decir, un \textit{SNARK} asume que la
-probadora maliciosa está limitada a tiempo polinomial \cite{thaler2022proofs}. Finalmente,
-\textit{conocimiento} se refiere a que no solo debe garantizarse que la afirmación es cierta, sino
-también que la probadora posee la información o testigo que hace la afirmación cierta.
+\textit{Succinct Non-interactive Arguments of Knowledge}) \cite[Capítulo~1]{thaler2022proofs}. Se
+hace necesario desglosar el acrónimo para entender su significado y las propiedades que se exigirán
+a un sistema de prueba para modelos de aprendizaje automático. En primer lugar, un sistema de prueba
+es \textit{sucinto} si el tamaño de la prueba generada por la probadora $P$ es pequeño y el tiempo
+que tarda la verificadora $V$ en comprobarla es del orden de milisegundos, independientemente del
+tamaño y complejidad del programa que se está demostrando. Es fácil ver que esta propiedad es clave
+para la escalabilidad. En segundo lugar, un sistema de prueba es \textit{no interactivo} si no hay
+un interrogatorio de ida y vuelta; la probadora genera un único mensaje de prueba y lo envía a la
+verificadora. Para lograr esto, se suele hacer uso de la \textit{heurística de Fiat-Shamir}, que
+emplea funciones \textit{hash} criptográficas para generar desafíos pseudoaleatorios de forma no
+interactiva \cite{fiat1987how}. Por otra parte, existe una distinción técnica entre \textit{argumento}
+y \textit{prueba}; la prueba tiene solidez estadística, protegiendo contra probadoras maliciosas que
+puedan tener poder de cómputo ilimitado, mientras que el argumento solo tiene solidez computacional,
+es decir, un \textit{SNARK} asume que la probadora maliciosa está limitada a tiempo polinomial
+\cite[Capítulo~1]{thaler2022proofs}. Finalmente, \textit{conocimiento} se refiere a que no solo debe
+garantizarse que la afirmación es cierta, sino también que la probadora posee la información o testigo
+que hace la afirmación cierta.
 
 Cuando a un \textit{SNARK} se le exige ocultar el \textit{testigo}, es decir, la información secreta
-que justifica la veracidad de la afirmación, se le denomina \textbf{zk-SNARK} \cite{thaler2022proofs}.
+que justifica la veracidad de la afirmación, se le denomina \textbf{zk-SNARK} \cite[Capítulo~1]{thaler2022proofs}.
 Como se puede observar, esto es la propiedad de \textit{conocimiento cero} introducida en la Sección
 \ref{zk_conocimiento_cero}. Así, para construir un \textit{zk-SNARK} de un modelo de aprendizaje
 automático, el primer inconveniente que surge es que un protocolo criptográfico no entiende de neuronas,
@@ -309,7 +311,7 @@ necesario traducir la aquitectura de la red neuronal a un conjunto de restriccio
 mediante un proceso de \textbf{aritmetización}.
 
 El estándar para representar circuitos aritméticos es el \textbf{Sistema de restricciones de Rango 1}
-(\textit{R1CS}, por sus siglas en inglés: \textit{Rank-1 Constraint System}) \cite{thaler2022proofs}.
+(\textit{R1CS}, por sus siglas en inglés: \textit{Rank-1 Constraint System}) \cite[Capítulo~8]{thaler2022proofs}.
 En un sistema R1CS, el cálculo completo de un programa se representa mediante un conjunto de restricciones
 polinomiales en forma de sistema de matrices, tal que
 \begin{equation}
@@ -339,7 +341,7 @@ Con ello, al evaluar el sistema, se obtiene $A \cdot z = x$, $B \cdot z = w$ y $
 que la Ecuación \ref{r1cs} se evalúa exactamente como la restricción que se desea probar, es decir,
 $x \cdot w = y$. La inferencia de una red neuronal completa, con múltiples capas y miles o millones
 de neuronas, no es más que la concatenación de miles de estas restricciones, añadiendo nuevas variables
-intermedias al vector testigo por cada operación elemental realizada. \todo{Explicar el papel de la constante 1 en el vector testigo.}
+intermedias al vector testigo por cada operación elemental realizada.
 
 Una vez construido el sistema R1CS, los protocolos modernos interpolan estas matrices para generar un
 conjunto de polinomios en un formato conocido como \textbf{Programas Aritméticos Cuadráticos}
@@ -363,8 +365,6 @@ correctamente, entonces la identidad polinómica se cumple y la inferencia es v�
 Al reducir todas las operaciones de la red neuronal a la verificación de la divisibilidad de un
 polinomio, la verificadora puede comprobar la validez de la prueba evaluando los polinomios en un
 único punto aleatorio, gracias al Lema de \textit{Schwartz-Zippel} \cite[Capítulo~4]{thaler2022proofs}.
-
-\todo{Modificar citas de libros para especificar capítulos.}
 
 \subsubsection{Cuantización y aritmética de punto fijo en $\mathbb{F}_p$}
 
