@@ -11,8 +11,7 @@
 \usepackage{amsmath, amsthm, amsfonts, amssymb}
 \usepackage{graphicx}
 \usepackage{subcaption}
-\usepackage[colorlinks=true, allcolors=blue]{hyperref}
-\usepackage{todonotes}
+\usepackage[colorlinks=true, allcolors=red]{hyperref}
 \setlength{\parskip}{1.5mm}
 
 \title{Inferencia verificable en modelos de Aprendizaje Automático mediante Pruebas de Conocimiento
@@ -274,17 +273,21 @@ una red neuronal y su proceso de inferencia a un circuito aritmético?
 
 \subsection{Pruebas de conocimiento cero para modelos de aprendizaje automático}
 
-\subsubsection{SNARKs y aritmetización}
-
 Ya se ha establecido que es teóricamente posible demostrar la correcta ejecución de cualquier programa,
 incluyendo modelos de aprendizaje automático, ocultando sus secretos mediante sistemas de prueba
 interactivos. Sin embargo, para que esto sea viable en la práctica, el modelo tradicional presenta
-serias limitaciones, principalmente en términos de eficiencia.
+serias limitaciones, principalmente en términos de eficiencia. Además, la aplicación de pruebas de
+conocimiento cero a modelos de aprendizaje automático (\textbf{ZKML}, por sus siglas en inglés:
+\textit{Zero-Knowledge Machine Learning}) presenta desafíos de ingeniería adicionales, como la
+incompatibilidad fundamental entre los tipos de datos y operaciones utilizados en estos modelos y
+los que se manejan en los protocolos criptográficos.
 
-Para superar estas limitaciones, la criptografía moderna ha evolucionado hacia la construcción de
-\textbf{sistemas de prueba no interactivos}, conocidos como \textbf{SNARKs} (por sus siglas en inglés:
-\textit{Succinct Non-interactive Arguments of Knowledge}) \cite[Capítulo~1]{thaler2022proofs}. Se
-hace necesario desglosar el acrónimo para entender su significado y las propiedades que se exigirán
+\subsubsection{SNARKs y aritmetización}
+
+Para superar las limitaciones de eficiencia, la criptografía moderna ha evolucionado hacia la
+construcción de \textbf{sistemas de prueba no interactivos}, conocidos como \textbf{SNARKs} (por sus
+siglas en inglés: \textit{Succinct Non-interactive Arguments of Knowledge}) \cite[Capítulo~1]{thaler2022proofs}.
+Se hace necesario desglosar el acrónimo para entender su significado y las propiedades que se exigirán
 a un sistema de prueba para modelos de aprendizaje automático. En primer lugar, un sistema de prueba
 es \textit{sucinto} si el tamaño de la prueba generada por la probadora $P$ es pequeño y el tiempo
 que tarda la verificadora $V$ en comprobarla es del orden de milisegundos, independientemente del
@@ -306,9 +309,9 @@ que justifica la veracidad de la afirmación, se le denomina \textbf{zk-SNARK} \
 Como se puede observar, esto es la propiedad de \textit{conocimiento cero} introducida en la Sección
 \ref{zk_conocimiento_cero}. Así, para construir un \textit{zk-SNARK} de un modelo de aprendizaje
 automático, el primer inconveniente que surge es que un protocolo criptográfico no entiende de neuronas,
-capas o pesos; operan evaluando polinomios sobre campos finitos $\mathbb{F}_p$. Por tanto, es
-necesario traducir la aquitectura de la red neuronal a un conjunto de restricciones polinomiales
-mediante un proceso de \textbf{aritmetización}.
+capas o pesos; operan evaluando polinomios sobre campos finitos $\mathbb{F}_p$, donde $p$ es un número
+primo criptográficamente grande. Por tanto, es necesario traducir la aquitectura de la red neuronal
+a un conjunto de restricciones polinomiales mediante un proceso de \textbf{aritmetización}.
 
 El estándar para representar circuitos aritméticos es el \textbf{Sistema de restricciones de Rango 1}
 (\textit{R1CS}, por sus siglas en inglés: \textit{Rank-1 Constraint System}) \cite[Capítulo~8]{thaler2022proofs}.
@@ -357,16 +360,41 @@ identidad polinómica:
 donde $A(x)$, $B(x)$ y $C(x)$ son polinomios que representan los operandos izquierdo, derecho y la
 salida en el vector testigo, respectivamente. $Z(x)$ es un polinomio que se anula en las raíces
 correspondientes a cada puerta lógica y $H(x)$ es el polinomio cociente generado por la probadora
-para demostrar que $A \cdot B - C$ es divisible por $Z(x)$. Si la probadora ha ejecutado la red neuronal
-correctamente, entonces la identidad polinómica se cumple y la inferencia es válida \footnote{La notación $A(x)$,
-  $B(x)$ y $C(x)$ proviene del artículo de \textit{Vitalik Buterin} \cite{buterin2016qap}, creador
-  de \textit{Ethereum}, y se han escogido por equivalencia didáctica con las matrices del sistema R1CS.}.
+para demostrar que $A(x) \cdot B(x) - C(x)$ es divisible por $Z(x)$. Si la probadora ha ejecutado la
+red neuronal correctamente, entonces la identidad polinómica se cumple y la inferencia es válida
+\footnote{La notación $A(x)$, $B(x)$ y $C(x)$ proviene del artículo de \textit{Vitalik Buterin}
+  \cite{buterin2016qap}, creador de \textit{Ethereum}, y se han escogido por equivalencia didáctica
+  con las matrices del sistema R1CS.}.
 
 Al reducir todas las operaciones de la red neuronal a la verificación de la divisibilidad de un
 polinomio, la verificadora puede comprobar la validez de la prueba evaluando los polinomios en un
 único punto aleatorio, gracias al Lema de \textit{Schwartz-Zippel} \cite[Capítulo~4]{thaler2022proofs}.
 
 \subsubsection{Cuantización y aritmética de punto fijo en $\mathbb{F}_p$}
+
+Tras establecer el proceso de aritmetización, ahora es necesario abordar el desafío de la
+incompatibilidad entre los tipos de datos y operaciones utilizados en los modelos de aprendizaje
+automático y los que se manejan en los protocolos criptográficos.
+
+Como se mencionó en la Sección \ref{redes_neuronales}, los modelos de aprendizaje automático, y en
+particular las redes neuronales, operan con números reales utilizando representaciones de punto
+flotante, típicamente de 16 o 32 bits. En cambio, un sistema de pruebas como \textit{zk-SNARK} evalúa
+circuitos aritméticos sobre cuerpos finitos $\mathbb{F}_p$, donde $p$ es un número primo grande. En
+este contexto, los únicos valores válidos son los enteros positivos en el rango $[0, p-1]$. Para
+llevar a cabo la inferencia de una red neuronal dentro de un circuito \textit{zk-SNARK}, será necesario
+transformar los pesos y activaciones de la red neuronal a este dominio matemático, lo cual se puede
+lograr mediante un proceso de \textbf{cuantización} \cite{gholami2021survey}.
+
+El primer paso consiste en transformar los números decimales a enteros mediante aritmética de punto
+fijo. Para ello, se define un factor de escala $S$ y, con ello, un valor real $r$ se cuantiza a su
+representación entera $r_q$ como:
+\begin{equation}
+  r_q = Q(r) = \text{Int}(r / S) - Z \label{cuantizacion}
+\end{equation}
+donde $Q$ es un operador de cuantización, $\text{Int}$ es la función de redondeo y truncamiento, y $Z$
+es un entero de desplazamiento que representa el valor cero en la representación cuantizada
+
+
 
 \subsubsection{Lidiando con la no linealidad}
 
