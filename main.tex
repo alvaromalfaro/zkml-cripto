@@ -36,6 +36,43 @@ Cero}
 % Introducción
 \section{Introducción}
 
+En los últimos años, el aprendizaje automático ha experimentado un crecimiento sin precedentes, tanto
+en capacidad como en aplicaciones. Modelos cada vez más complejos, como los grandes modelos de
+lenguaje, se integran en aplicaciones críticas, como el diagnóstico médico, la conducción autónoma
+o la toma de decisiones financieras. Junto a ello, surge un modelo de negocio en el que un proveedor
+despliega un modelo entrenado y ofrece inferencia a usuarios, normalmente, sin revelar los detalles
+internos del modelo. Esto introduce un problema de confianza. El usuario no tiene forma de verificar
+que el proveedor está ejecutando el modelo que afirma ejecutar, ni que lo hace de forma correcta.
+Por otro lado, el proveedor tiene incentivos económicos para no revelar los pesos de su modelo, pues
+son su propiedad intelectual y son el resultado de un proceso costoso de entrenamiento. De esta forma,
+surge una tensión entre la necesidad de verificar la inferencia de un modelo y la privacidad del proveedor:
+¿es posible que el usuario pueda confiar en el resultado sin que el proveedor tenga que revelar
+sus secretos?
+
+Las pruebas de conocimiento cero surgen como solución a este problema. Estos protocolos permiten a
+una parte demostrar que ha ejecutado un cómputo correctamente sin revelar información secreta sobre
+el mismo, como los pesos del modelo o, incluso, los propios datos de entrada. Las aplicaciones de
+estas pruebas son diversas. En entornos centralizados, garantizan la integridad de la inferencia,
+mientras que, en entornos descentralizados, como las \textit{blockchains}, permiten verificar las
+transacciones y los contratos inteligentes sin revelar información sensible.
+
+A pesar de su potencial, la aplicación de pruebas de conocimiento cero a modelos de aprendizaje
+automático presenta grandes desafíos técnicos. Los protocolos criptográficos operan sobre campos
+finitos, mientras que los modelos de aprendizaje automático, en general, manejan números reales y
+operaciones no lineales. Unificar estos dos mundos requiere traducir la arquitectura de un modelo y
+su proceso de inferencia mediante técnicas de aritmetización, cuantificación y estrategias específicas
+para manejar la no linealidad.
+
+En este trabajo, se abordarán estos desafíos tanto desde una perspectiva teórica como práctica. En
+primer lugar, se presentarán los fundamentos teóricos necesarios para entender el aprendizaje
+automático y, en concreto, las redes neuronales artificiales, así como el concepto de pruebas de
+conocimiento cero. A continuación, se explorarán los obstáculos que surgen al trasladar la inferencia
+de una red neuronal a un circuito aritmético compatible con un sistema de prueba de conocimiento
+cero, incluyendo la aritmetización mediante sistemas R1CS, la cuantización de los pesos y las
+activaciones a aritmética de campo finito, y el manejo de funciones de activación no lineales, con
+un enfoque en la función \textit{ReLU}. Por último, se presenta una implementación práctica en
+\textit{MATLAB} como prueba de concepto donde se integran los conceptos desarrollados.
+
 
 % Fundamentos teóricos
 \section{Fundamentos teóricos} \label{fundamentos}
@@ -84,16 +121,17 @@ general, el más común en la actualidad.
 En una red neuronal artificial, el proceso de \textbf{inferencia} se refiere a la generación de una
 salida a partir de una entrada dada, utilizando los pesos de los enlaces entre las neuronas. En cada
 neurona, se realiza una suma ponderada de las señales recibidas a través de sus enlaces. Así, en una
-cierta neurona $k$, la entrada total que recibe en un instante de tiempo $t$ viene dada por
+cierta neurona $k$, la entrada total que recibe viene dada por
 \begin{equation}
   s_k(t) = \sum_{j} w_{jk}(t) y_j(t) + \theta_k(t) \label{na_entrada_total}
 \end{equation}
 donde $w_{jk}(t)$ representa el peso del enlace que conecta la neurona $j$ con la neurona $k$,
 siendo $j$, normalmente, una neurona de la capa anterior \cite[Capítulo~2]{krose1996introduction}.
-Cuando el peso es positivo, se dice que el enlace es \textit{excitatorio}, mientras que, si es
-negativo, se dice que es \textit{inhibitorio}. Luego, $y_j(t)$ representa la señal de salida de la
-neurona $j$ y, finalmente, $\theta_k(t)$ representa el \textit{sesgo} de la neurona $k$, un valor
-constante que permite ajustar su umbral de activación.
+En este caso, $t$ no representa un instante temporal, como sería el caso de las redes neuronales
+recurrentes, sino la posición de la capa en la red. Cuando el peso es positivo, se dice que el enlace
+es \textit{excitatorio}, mientras que, si es negativo, se dice que es \textit{inhibitorio}. Luego,
+$y_j(t)$ representa la señal de salida de la neurona $j$ y, finalmente, $\theta_k(t)$ representa el
+\textit{sesgo} de la neurona $k$, un valor constante que permite ajustar su umbral de activación.
 
 Tras ello, la neurona $k$ aplica una \textit{función de activación} a su entrada total, $s_k(t)$,
 para generar su salida, tal que
@@ -262,16 +300,17 @@ ser verificado en tiempo polinomial, es decir, cualquier lenguaje en la clase de
 posee un sistema de prueba interactivo de conocimiento cero computacional, asumiendo la existencia
 de funciones de un solo sentido \cite{goldreich1991proofs}. También, resulta de interés recordar que
 cualquier problema perteneciente a la clase de complejidad $NP$ se puede reducir a un problema de
-satisfacibilidad de circuitos booleanos o aritméticos (\textit{CSAT}) en tiempo polinomial por el
-teorema de \textit{Cook-Levin}, puesto que \textit{CSAT} es un problema $NP$-completo
-\cite{cook1971complexity, levin1973universal}. Además, se recuerda, la inferencia en una red neuronal
-consiste en aplicar una serie de pesos precalculados a unos datos de entrada para obtener una salida,
-lo cual no deja de ser más que la aplicación de una secuencia de operaciones matemáticas deterministas.
-Demostrar que se ha ejecutado una red neuronal sobre una entrada específica es, por tanto, una
-declaración de tipo $NP$. El problema que surge ahora es, ¿cómo se puede traducir la arquitectura de
-una red neuronal y su proceso de inferencia a un circuito aritmético?
+satisfacibilidad de circuitos booleanos (\textit{CSAT}) en tiempo polinomial por el teorema de
+\textit{Cook-Levin}, puesto que \textit{CSAT} es un problema $NP$-completo \cite{cook1971complexity, levin1973universal}.
+A su vez, los circuitos booleanos se pueden simular mediante circuitos aritméticos sobre campos finitos
+\cite[Capítulo~4]{thaler2022proofs}. Además, se recuerda, la inferencia en una red neuronal consiste
+en aplicar una serie de pesos precalculados a unos datos de entrada para obtener una salida, lo cual
+no deja de ser más que la aplicación de una secuencia de operaciones matemáticas deterministas. Demostrar
+que se ha ejecutado una red neuronal sobre una entrada específica es, por tanto, una declaración de tipo $NP$.
+El problema que surge ahora es, ¿cómo se puede traducir la arquitectura de una red neuronal y su proceso
+de inferencia a un circuito aritmético?
 
-\subsection{Pruebas de conocimiento cero para modelos de aprendizaje automático}
+\subsection{Pruebas de conocimiento cero para modelos de aprendizaje automático} \label{zkml}
 
 Ya se ha establecido que es teóricamente posible demostrar la correcta ejecución de cualquier programa,
 incluyendo modelos de aprendizaje automático, ocultando sus secretos mediante sistemas de prueba
@@ -282,7 +321,7 @@ conocimiento cero a modelos de aprendizaje automático (\textbf{ZKML}, por sus s
 incompatibilidad fundamental entre los tipos de datos y operaciones utilizados en estos modelos y
 los que se manejan en los protocolos criptográficos.
 
-\subsubsection{SNARKs y aritmetización}
+\subsubsection{SNARKs y aritmetización} \label{snarks_aritmetizacion}
 
 Para superar las limitaciones de eficiencia, la criptografía moderna ha evolucionado hacia la
 construcción de \textbf{sistemas de prueba no interactivos}, conocidos como \textbf{SNARKs} (por sus
@@ -370,7 +409,7 @@ Al reducir todas las operaciones de la red neuronal a la verificación de la div
 polinomio, la verificadora puede comprobar la validez de la prueba evaluando los polinomios en un
 único punto aleatorio, gracias al Lema de \textit{Schwartz-Zippel} \cite[Capítulo~4]{thaler2022proofs}.
 
-\subsubsection{Cuantización y aritmética de punto fijo en $\mathbb{F}_p$}
+\subsubsection{Cuantización y aritmética de punto fijo en \texorpdfstring{$\mathbb{F}_p$}{Fp}} \label{cuantizacion_aritmetica}
 
 Tras establecer el proceso de aritmetización, ahora es necesario abordar el desafío de la
 incompatibilidad entre los tipos de datos y operaciones utilizados en los modelos de aprendizaje
@@ -389,14 +428,91 @@ El primer paso consiste en transformar los números decimales a enteros mediante
 fijo. Para ello, se define un factor de escala $S$ y, con ello, un valor real $r$ se cuantiza a su
 representación entera $r_q$ como:
 \begin{equation}
-  r_q = Q(r) = \text{Int}(r / S) - Z \label{cuantizacion}
+  r_q = Q(r) = \text{Int}(r / S) + Z \label{cuantizacion}
 \end{equation}
 donde $Q$ es un operador de cuantización, $\text{Int}$ es la función de redondeo y truncamiento, y $Z$
-es un entero de desplazamiento que representa el valor cero en la representación cuantizada
+es un entero de desplazamiento que representa el valor cero en la representación cuantizada.
 
+Un aspecto importante a destacar es que los pesos de una red neuronal pueden ser positivos y
+negativos, como se indicó en la Sección \ref{redes_neuronales}. Sin embargo, en un sistema de
+pruebas como \textit{zk-SNARK}, solo se pueden manejar enteros positivos, puesto que el campo
+finito $\mathbb{F}_p$ no incluye números negativos. Para representar números negativos, se puede
+utilizar el inverso aditivo módulo $p$, de forma que un valor $-x$ se representa como $p-x \in \mathbb{F}_p$.
+Esto es consistente con aritmética de campos finitos, ya que $x + (p-x) \equiv 0\ (\mathrm{mod}\ p)$. Para
+distinguir entre números positivos y negativos, se puede establecer un umbral de cuantización, de
+forma que los elementos en el rango $[0, p/2]$ se interpretan como positivos, mientras que los
+elementos en el rango $[p/2, p-1]$ representan valores negativos con magnitud $p-x$.
 
+A pesar de ello, esta representación introduce un coste adicional en el circuito aritmético. Algunas
+funciones de activación, como \textit{ReLU}, requieren determinar el signo de un valor, por lo que
+deben descomponer el elemento en su representación binaria para verificar si se encuentran por encima
+o por debajo del umbral de cuantización, generando restricciones adicionales en el circuito.
+\textit{Feng et al.} proponen optimizaciones como la agrupación de bits de signo, que reduce el
+número de restricciones necesarias generadas por estas verificaciones \cite{feng2021zen}. Y, ahora
+que se menciona la función de activación \textit{ReLU}, es buen momento para enfrentar un último
+desafío.
 
-\subsubsection{Lidiando con la no linealidad}
+\subsubsection{Lidiando con la no linealidad} \label{lidiando_no_linealidad}
+
+La aritmetización de operaciones lineales de una red neuronal, como la mostrada en la Ecuación
+\ref{na_entrada_total}, se traduce de forma directa a un sistema R1CS, como se ha ilustrado en la
+Sección \ref{snarks_aritmetizacion}. Sin embargo, como se indicó en la Sección \ref{redes_neuronales},
+es común que las redes neuronales apliquen funciones de activación no lineales, que no se pueden
+expresar como una simple multiplicación entre dos combinaciones lineales. Se presenta el caso de la
+función de activación \textit{ReLU} (\textit{Rectified Linear Unit}), que se define como
+\begin{equation}
+  \text{ReLU}(x) = \max(0, x) \label{relu}
+\end{equation}
+
+Es fácil ver que su principal problema es que requiere determinar el signo de su entrada, es decir,
+si $x$ es positivo, el resultado es $x$, mientras que, si $x$ es negativo, el resultado es 0. Realizar
+esta comprobación no es trivial, ya que la comparación de magnitudes no es una operación nativa en
+$\mathbb{F}_p$. Para resolver este problema, se puede utilizar la técnica de \textbf{descomposición en bits}
+\cite[Capítulo~6]{thaler2022proofs}. Dado un elemento $x \in \mathbb{F}_p$, se introducen $n = \log_2(p)$
+variables auxiliares $b_0, b_1, \ldots, b_{n-1}$ en el vector testigo, que representan los bits de
+$x$. Para que esta descomposición sea válida, se imponen dos restricciones:
+\begin{enumerate}
+  \item Cada variable $b_i$ debe ser un valor booleano, lo cual se puede garantizar mediante la
+        restricción $b_i \cdot (b_i - 1) = 0$, que solo se cumple si $b_i$ es 0 o 1.
+  \item Los bits deben permitir reconstruir el valor original $x$, esto es,
+        \begin{equation}
+          x = \sum_{i=0}^{n-1} b_i \cdot 2^i \label{descomposicion_bits}
+        \end{equation}
+\end{enumerate}
+
+Una vez descompuesto el elemento $x$ en sus bits, se puede determinar su signo verificando el bit más
+significativo, de forma que si $b_{n-1} = 0$, entonces $x < p/2$ y se interpreta como positivo, mientras
+que si $b_{n-1} = 1$, entonces $x \geq p/2$ y se interpreta como negativo. Con ello, es trivial
+implementar la función de activación \textit{ReLU} mediante la restricción \footnote{Notación
+  escogida como simplificación didáctica. En la práctica, los \textit{frameworks} suelen llevar a cabo
+  implementaciones más complejas.}
+\begin{equation}
+  \text{ReLU}(x) = x \cdot s \label{relu_restriccion}
+\end{equation}
+donde $s$ es una variable binaria derivada del bit de signo.
+
+Sin embargo, el coste del procedimiento es elevado. La restricción $b_i \cdot (b_i - 1) = 0$ genera
+una restricción R1CS por cada bit, generando un total de $n = \log_2(p)$ restricciones por cada
+función de activación \textit{ReLU} aplicada. Dado que una red neuronal típica puede contener miles
+o millones de neuronas, cada una aplicando una función de activación no lineal, el número total de
+restricciones generadas puede ser muy elevado, afectando a la eficiencia del sistema de prueba.
+De nuevo, \textit{Feng et al.} proponen optimizar mediante la agrupación de bits de signo \cite{feng2021zen}.
+Asimismo, \textit{Sun et al.} formalizan que el enfoque de descomposición en bits tiene un coste
+$\Omega(mn log_2 B)$ para una capa de dimensiones $m \times n$ con valores acotados por $B$
+\cite{sun2024zkllm}.
+
+Una alternativa a la descomposición en bits es utilizar \textbf{tablas de búsqueda}, que permiten
+verificar operaciones no lineales precalculando una tabla de valores válidos y comprobando la
+pertenencia del resultado a la tabla \cite{plookup2020}. Esto reduce significativamente el número de
+restricciones necesarias.
+
+En general, los procesos de aritmetización, cuantización y manejo de la no linealidad conllevan un
+coste adicional significativo respecto a la inferencia directa. Trabajos como el de \textit{Feng et al.}
+han demostrado que la generación de una prueba en una red neuronal puede ser de varios órdenes de
+magnitud más lenta que la inferencia original, según la arquitectura y el sistema de prueba utilizado
+\cite{feng2021zen}. Esto hace que la corrección y privacidad en el campo de \textit{ZKML} se obtenga
+a cambio de un coste computacional elevado, motivando la investigación en optimizaciones y nuevas
+técnicas que busquen reducirlo.
 
 \bibliographystyle{ieeetr}
 \bibliography{refs}
