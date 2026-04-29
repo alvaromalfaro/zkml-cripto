@@ -38,30 +38,30 @@ Cero}
 
 En los últimos años, el aprendizaje automático ha experimentado un crecimiento sin precedentes, tanto
 en capacidad como en aplicaciones. Modelos cada vez más complejos, como los grandes modelos de
-lenguaje, se integran en aplicaciones críticas, como el diagnóstico médico, la conducción autónoma
-o la toma de decisiones financieras. Junto a ello, surge un modelo de negocio en el que un proveedor
-despliega un modelo entrenado y ofrece inferencia a usuarios, normalmente, sin revelar los detalles
-internos del modelo. Esto introduce un problema de confianza. El usuario no tiene forma de verificar
-que el proveedor está ejecutando el modelo que afirma ejecutar, ni que lo hace de forma correcta.
-Por otro lado, el proveedor tiene incentivos económicos para no revelar los pesos de su modelo, pues
-son su propiedad intelectual y son el resultado de un proceso costoso de entrenamiento. De esta forma,
-surge una tensión entre la necesidad de verificar la inferencia de un modelo y la privacidad del proveedor:
-¿es posible que el usuario pueda confiar en el resultado sin que el proveedor tenga que revelar
-sus secretos?
+lenguaje, se integran en aplicaciones críticas, como el diagnóstico médico \cite{maity2025largelanguagemodels},
+la conducción autónoma \cite{li2025applications} o la toma de decisiones financieras \cite{darwish2025stock}.
+Junto a ello, surge un modelo de negocio en el que un proveedor despliega un modelo entrenado y ofrece
+inferencia a usuarios, normalmente, sin revelar los detalles internos del modelo; es el caso de
+\textit{Google} con su modelo \textit{Gemini}, \textit{OpenAI} con \textit{ChatGPT}, y otros. Esto
+introduce un problema de confianza. El usuario no tiene forma de verificar que el proveedor está
+ejecutando el modelo que afirma ejecutar, ni que lo hace de forma correcta. Por otro lado, el
+proveedor tiene incentivos económicos para no revelar los pesos de su modelo, pues son su propiedad
+intelectual y el resultado de un proceso costoso de entrenamiento. De esta forma, surge una tensión
+entre la necesidad de verificar la inferencia de un modelo y la privacidad del proveedor: ¿es posible
+que el usuario pueda confiar en el resultado sin que el proveedor tenga que revelar sus secretos?
 
-Las pruebas de conocimiento cero surgen como solución a este problema. Estos protocolos permiten a
-una parte demostrar que ha ejecutado un cómputo correctamente sin revelar información secreta sobre
-el mismo, como los pesos del modelo o, incluso, los propios datos de entrada. Las aplicaciones de
-estas pruebas son diversas. En entornos centralizados, garantizan la integridad de la inferencia,
-mientras que, en entornos descentralizados, como las \textit{blockchains}, permiten verificar las
-transacciones y los contratos inteligentes sin revelar información sensible.
+Las pruebas de conocimiento cero surgieron para permitir a una parte demostrar que ha ejecutado un
+cómputo correctamente sin revelar información secreta sobre el mismo \cite{goldreich2001foundations}.
+Las aplicaciones de estas pruebas son diversas, desde \textit{blockchain} para realizar transacciones
+y contratos inteligentes privatizando a los usuarios involucrados, hasta en el propio aprendizaje
+automático para demostrar la ejecución de un modelo determinado sobre unos datos concretos \cite{lavin2026survey}.
 
 A pesar de su potencial, la aplicación de pruebas de conocimiento cero a modelos de aprendizaje
-automático presenta grandes desafíos técnicos. Los protocolos criptográficos operan sobre campos
-finitos, mientras que los modelos de aprendizaje automático, en general, manejan números reales y
-operaciones no lineales. Unificar estos dos mundos requiere traducir la arquitectura de un modelo y
-su proceso de inferencia mediante técnicas de aritmetización, cuantificación y estrategias específicas
-para manejar la no linealidad.
+automático presenta grandes desafíos técnicos \cite{peng2026survey}. Los protocolos criptográficos
+operan sobre cuerpos finitos, mientras que los modelos de aprendizaje automático manejan números
+reales y operaciones no lineales. Unificar estos dos mundos requiere traducir la arquitectura de un
+modelo y su proceso de inferencia mediante técnicas de aritmetización, cuantificación y estrategias
+específicas para manejar la no linealidad.
 
 En este trabajo, se abordarán estos desafíos tanto desde una perspectiva teórica como práctica. En
 primer lugar, se presentarán los fundamentos teóricos necesarios para entender el aprendizaje
@@ -69,7 +69,7 @@ automático y, en concreto, las redes neuronales artificiales, así como el conc
 conocimiento cero. A continuación, se explorarán los obstáculos que surgen al trasladar la inferencia
 de una red neuronal a un circuito aritmético compatible con un sistema de prueba de conocimiento
 cero, incluyendo la aritmetización mediante sistemas R1CS, la cuantización de los pesos y las
-activaciones a aritmética de campo finito, y el manejo de funciones de activación no lineales, con
+activaciones a aritmética de cuerpo finito, y el manejo de funciones de activación no lineales, con
 un enfoque en la función \textit{ReLU}. Por último, se presenta una implementación práctica en
 \textit{MATLAB} como prueba de concepto donde se integran los conceptos desarrollados.
 
@@ -105,18 +105,9 @@ donde cada uno de ellos simboliza la fuerza de la conexión, también conocida c
 red neuronal suele contener desde algunas decenas hasta miles o incluso millones de neuronas
 artificiales, organizadas en diferentes \textit{capas}. En general, las neuronas de cada capa se
 encuentran conectadas a las de la capa siguiente, aunque hay diferentes tipos de arquitecturas con
-diferentes configuraciones de capas y conexiones. Un ejemplo típico de red neuronal se muestra en la
-Figura \ref{fig:nn}, la cual está compuesta por una capa de entrada con tres neuronas, una capa de
-salida con dos neuronas y dos capas ocultas con cinco neuronas. Cuando una red neuronal contiene dos
-o más capas ocultas, se denomina \textit{red neuronal profunda}, siendo este el caso mostrado y, en
-general, el más común en la actualidad.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.6\textwidth]{figs/dnn.png}
-  \caption{Ejemplo de red neuronal artificial.}
-  \label{fig:nn}
-\end{figure}
+diferentes configuraciones de capas y conexiones. Cuando una red neuronal contiene dos o más capas
+ocultas, se denomina \textit{red neuronal profunda}, siendo este el caso mostrado y, en general, el
+más común en la actualidad.
 
 En una red neuronal artificial, el proceso de \textbf{inferencia} se refiere a la generación de una
 salida a partir de una entrada dada, utilizando los pesos de los enlaces entre las neuronas. En cada
@@ -302,7 +293,7 @@ de funciones de un solo sentido \cite{goldreich1991proofs}. También, resulta de
 cualquier problema perteneciente a la clase de complejidad $NP$ se puede reducir a un problema de
 satisfacibilidad de circuitos booleanos (\textit{CSAT}) en tiempo polinomial por el teorema de
 \textit{Cook-Levin}, puesto que \textit{CSAT} es un problema $NP$-completo \cite{cook1971complexity, levin1973universal}.
-A su vez, los circuitos booleanos se pueden simular mediante circuitos aritméticos sobre campos finitos
+A su vez, los circuitos booleanos se pueden simular mediante circuitos aritméticos sobre cuerpos finitos
 \cite[Capítulo~4]{thaler2022proofs}. Además, se recuerda, la inferencia en una red neuronal consiste
 en aplicar una serie de pesos precalculados a unos datos de entrada para obtener una salida, lo cual
 no deja de ser más que la aplicación de una secuencia de operaciones matemáticas deterministas. Demostrar
@@ -348,7 +339,7 @@ que justifica la veracidad de la afirmación, se le denomina \textbf{zk-SNARK} \
 Como se puede observar, esto es la propiedad de \textit{conocimiento cero} introducida en la Sección
 \ref{zk_conocimiento_cero}. Así, para construir un \textit{zk-SNARK} de un modelo de aprendizaje
 automático, el primer inconveniente que surge es que un protocolo criptográfico no entiende de neuronas,
-capas o pesos; operan evaluando polinomios sobre campos finitos $\mathbb{F}_p$, donde $p$ es un número
+capas o pesos; operan evaluando polinomios sobre cuerpos finitos $\mathbb{F}_p$, donde $p$ es un número
 primo criptográficamente grande. Por tanto, es necesario traducir la aquitectura de la red neuronal
 a un conjunto de restricciones polinomiales mediante un proceso de \textbf{aritmetización}.
 
@@ -438,7 +429,7 @@ negativos, como se indicó en la Sección \ref{redes_neuronales}. Sin embargo, e
 pruebas como \textit{zk-SNARK}, solo se pueden manejar enteros positivos, puesto que el campo
 finito $\mathbb{F}_p$ no incluye números negativos. Para representar números negativos, se puede
 utilizar el inverso aditivo módulo $p$, de forma que un valor $-x$ se representa como $p-x \in \mathbb{F}_p$.
-Esto es consistente con aritmética de campos finitos, ya que $x + (p-x) \equiv 0\ (\mathrm{mod}\ p)$. Para
+Esto es consistente con aritmética de cuerpos finitos, ya que $x + (p-x) \equiv 0\ (\mathrm{mod}\ p)$. Para
 distinguir entre números positivos y negativos, se puede establecer un umbral de cuantización, de
 forma que los elementos en el rango $[0, p/2]$ se interpretan como positivos, mientras que los
 elementos en el rango $[p/2, p-1]$ representan valores negativos con magnitud $p-x$.
@@ -513,6 +504,50 @@ magnitud más lenta que la inferencia original, según la arquitectura y el sist
 \cite{feng2021zen}. Esto hace que la corrección y privacidad en el campo de \textit{ZKML} se obtenga
 a cambio de un coste computacional elevado, motivando la investigación en optimizaciones y nuevas
 técnicas que busquen reducirlo.
+
+\subsubsection{\textit{Frameworks} y herramientas modernas} \label{zkml_frameworks}
+
+Los fundamentos teóricos presentados en las secciones anteriores han dado lugar, en los últimos años,
+a la aparición de múltiples \textit{frameworks} y herramientas que implementan pruebas de conocimiento
+cero para modelos de aprendizaje automático. A continuación, se presentan brevemente algunos de los
+más relevantes.
+
+Por un lado, \textbf{EZKL} es una herramienta de código abierto diseñada para generar pruebas de
+inferencia verificable a partir de modelos exportados en formato \textit{ONNX} (\textit{Open Neural
+  Network Exchange}) \cite{ezkl2024docs}. Internamente, EZKL traduce la arquitectura de la red neuronal
+a un circuito aritmético compatible con el sistema de prueba \textbf{Halo2}, que utiliza un esquema
+basado en el paradigma \textbf{PLONK} (\textit{Permutations over Lagrange-bases for Oecumenical
+  Noninteractive arguments of Knowledge}) \cite{plonk2019}, lo que permite prescindir de una ceremonia
+de configuración de confianza requerida por algunos sistemas. Además, incorpora soporte nativo
+para tablas de búsqueda, facilitando la gestión eficiente de funciones de activación no lineales.
+
+Por otra parte, \textbf{Circom} \cite{belles2023circom}, tecnología de sello español, es un lenguaje
+de programación de circuitos aritméticos R1CS, ampliamente utilizado en el ecosistema \textit{blockchain},
+especialmente en aplicaciones sobre \textit{Ethereum}. A diferencia de EZKL, Circom no se especializa
+en modelos de aprendizaje automático, sino que proporciona un entorno general para construir circuitos
+aritméticos de forma modular; su aplicación a modelos de aprendizaje automático requiere, por tanto,
+de una traducción manual de la arquitectura del modelo o mediante librerías adicionales.
+
+Luego, \textbf{ZEN}, propuesto por \textit{Feng et al.} \cite{feng2021zen}, es un compilador optimizado
+específicamente para la generación de pruebas de inferencia en redes neuronales. Su contribución
+principal reside en una serie de optimizaciones a nivel de circuito, que reducen el número de
+restricciones generadas por las operaciones de cuantización y las funciones de activación no lineales.
+
+Finalmente, \textbf{ZKLLM}, propuesto por \textit{Sun et al.} \cite{sun2024zkllm}, representa la
+``frontera'' actual del campo, pues aborda la generación de pruebas de conocimiento cero para grandes
+modelos de lenguaje. Los autores proponen técnicas como \textit{tlookup}, una generalización de las
+tablas de búsqueda a tensores, para manejar operaciones no lineales presentes en arquitecturas
+basadas en \textit{Transformers}, la base de los grandes modelos de lenguaje, para poder escalar así
+a modelos masivos.
+
+A pesar de los avances logrados por estas herramientas, su complejidad interna dificulta la comprensión
+de los mecanismos subyacentes. Para ilustrar el proceso completo de forma transparente y didáctica, se
+presenta, en la siguiente sección, una implementación simple en \textit{MATLAB} que reproduce las etapas
+del proceso de inferencia verificable, aunque sin alcanzar la complejidad de los \textit{frameworks}
+modernos. Se llevará a cabo la cuantización de los pesos y activaciones, la aritmetización de la red
+neuronal mediante un sistema R1CS y la generación y verificación de la prueba.
+
+\section{Prueba de concepto en \textit{MATLAB}} \label{zkml_matlab}
 
 \bibliographystyle{ieeetr}
 \bibliography{refs}
