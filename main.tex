@@ -1,39 +1,200 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper, 11pt]{article}
+
+%% ============================================================
+%%  IDIOMA Y TIPOGRAFÍA
+%% ============================================================
 \usepackage{polyglossia}
 \setmainlanguage{spanish}
+\usepackage{fontspec}
 \setmainfont{Carlito}
 \usepackage{anyfontsize}
-\usepackage{fontspec}
+\usepackage{microtype}
+
+%% ============================================================
+%%  COLORES INSTITUCIONALES
+%% ============================================================
+\usepackage{xcolor}
+\definecolor{uclm}{HTML}{B30033}
+\definecolor{esii-rojo}{HTML}{B20C36}
+\definecolor{esii-gris}{HTML}{575756}
+\definecolor{esii-negro}{HTML}{1D1D1B}
+\definecolor{esii-plata}{HTML}{9D9D9C}
+
+%% ============================================================
+%%  PÁGINA
+%% ============================================================
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2.76cm, right=2.76cm,
+            headheight=22pt, marginparwidth=1.75cm]{geometry}
 \usepackage{setspace}
-\singlespacing
-\usepackage{textcomp,marvosym,pifont}
-\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\onehalfspacing
+\setlength{\parskip}{1.5mm}
+\setlength{\parindent}{1.5em}
+
+%% ============================================================
+%%  MATEMÁTICAS Y SÍMBOLOS
+%% ============================================================
 \usepackage{amsmath, amsthm, amsfonts, amssymb}
+\usepackage{textcomp, marvosym, pifont}
+
+%% ============================================================
+%%  GRÁFICOS
+%% ============================================================
 \usepackage{graphicx}
 \usepackage{subcaption}
-\usepackage[colorlinks=true, allcolors=red]{hyperref}
-\setlength{\parskip}{1.5mm}
 
-\title{Inferencia verificable en modelos de Aprendizaje Automático mediante Pruebas de Conocimiento
-Cero}
-\author{Álvaro Martínez Alfaro\\
-  \small alvaro.martinez39@alu.uclm.es\\
-  \small Criptografía, ESII, Universidad de Castilla-La Mancha\\
-  \small Albacete, España
+%% ============================================================
+%%  ENCABEZADOS Y PIES DE PÁGINA
+%% ============================================================
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{esii-gris}{\nouppercase{\leftmark}}}
+\fancyhead[R]{\small\textcolor{esii-plata}{\thepage}}
+\renewcommand{\headrulewidth}{0.6pt}
+\renewcommand{\headrule}{{\color{uclm}\rule{\headwidth}{0.6pt}}}
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyfoot[C]{\small\textcolor{esii-plata}{\thepage}}
+  \renewcommand{\headrulewidth}{0pt}
 }
 
-% ==================================================================================================
+%% ============================================================
+%%  SECCIONES
+%% ============================================================
+\usepackage{titlesec}
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{esii-negro}}
+  {\textcolor{uclm}{\thesection}}{0.8em}{}
+  [\vspace{0.15ex}{\color{uclm}\titlerule[0.8pt]}\vspace{0.3ex}]
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{esii-negro}}
+  {\textcolor{esii-rojo}{\thesubsection}}{0.8em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{esii-negro}}
+  {\textcolor{esii-gris}{\thesubsubsection}}{0.8em}{}
+
+%% ============================================================
+%%  ABSTRACT CON BORDE LATERAL
+%% ============================================================
+\usepackage{mdframed}
+\mdfdefinestyle{resumen}{%
+  linecolor=uclm,
+  linewidth=2.5pt,
+  topline=false,
+  rightline=false,
+  bottomline=false,
+  backgroundcolor=uclm!4,
+  innerleftmargin=1.2em,
+  innerrightmargin=1em,
+  innertopmargin=0.8em,
+  innerbottommargin=0.8em,
+  skipabove=1.5em,
+  skipbelow=1.5em,
+}
+
+\renewenvironment{abstract}{%
+  \begin{mdframed}[style=resumen]
+    \noindent{\normalfont\bfseries\large\color{uclm}Resumen}\par\smallskip
+    \normalfont\small
+}{%
+  \end{mdframed}
+}
+
+%% ============================================================
+%%  HIPERVÍNCULOS
+%% ============================================================
+\usepackage[colorlinks=true, linkcolor=uclm, citecolor=uclm,
+            urlcolor=uclm, bookmarksnumbered=true]{hyperref}
+
+%% ============================================================
+%%  DATOS DEL DOCUMENTO  (editar aquí)
+%% ============================================================
+\newcommand{\TiTulo}{Inferencia verificable en modelos de Aprendizaje Automático
+  mediante Pruebas de Conocimiento Cero}
+\newcommand{\Autor}{Álvaro Martínez Alfaro}
+\newcommand{\AutorEmail}{alvaro.martinez39@alu.uclm.es}
+\newcommand{\Asignatura}{Criptografía}
+\newcommand{\Escuela}{Escuela Superior de Ingeniería Informática}
+\newcommand{\Universidad}{Universidad de Castilla-La Mancha}
+\newcommand{\Ciudad}{Albacete, España}
+\newcommand{\Fecha}{\today}
+
+%% ============================================================
+%%  PORTADA PERSONALIZADA
+%% ============================================================
+\newcommand{\Portada}{%
+  \begin{titlepage}
+    \begin{center}
+      \includegraphics[height=1.5cm]{figs/Logo_UCLM_40.jpeg}%
+      \hfill%
+      \includegraphics[height=1.5cm]{figs/logo_ESII_AB_uclm.png}
+
+      \vspace{0.6cm}
+      {\color{uclm}\rule{\linewidth}{1.8pt}}
+      \vspace{0.4cm}
+
+      {\large\textcolor{esii-gris}{\Universidad}}\\[0.2cm]
+      {\large\textcolor{esii-gris}{\Escuela}}\\[0.3cm]
+      {\normalsize\textcolor{esii-plata}{\Asignatura}}
+
+      \vfill
+
+      {\Huge\bfseries\color{esii-negro}\TiTulo\par}
+
+      \vfill
+
+      {\color{esii-plata}\rule{\linewidth}{0.5pt}}
+      \vspace{0.7cm}
+
+      {\large\bfseries\color{esii-negro}\Autor}\\[0.25cm]
+      {\normalsize\textcolor{esii-gris}\AutorEmail}\\[0.15cm]
+      {\normalsize\textcolor{esii-plata}\Ciudad}\\[0.35cm]
+      {\normalsize\textcolor{esii-gris}\Fecha}
+
+      \vspace{0.4cm}
+    \end{center}
+  \end{titlepage}
+}
+
+%% ============================================================
 
 \begin{document}
 
-\maketitle
+\Portada
+\pagenumbering{roman}
 
-%% Resumen
 \begin{abstract}
-  % TODO: escribir resumen.
+  El aprendizaje automático se integra cada vez más en aplicaciones críticas bajo un modelo de
+  inferencia como servicio, en el que el proveedor no revela los detalles internos de su modelo.
+  Esto introduce un problema de confianza: el usuario no puede verificar que la inferencia se ha
+  realizado correctamente ni que el modelo empleado es el declarado. Las pruebas de conocimiento
+  cero permiten demostrar la correcta ejecución de un cómputo sin revelar información secreta,
+  ofreciendo una solución teórica al problema. Sin embargo, su aplicación a modelos de aprendizaje
+  automático, campo conocido como \textit{Zero-Knowledge Machine Learning}, presenta importantes
+  desafíos técnicos derivados de la incompatibilidad entre la aritmética de punto flotante empleada
+  por muchos modelos de aprendizaje automático y los cuerpos finitos sobre los que operan los
+  protocolos criptográficos.
+
+  En este trabajo se estudian los fundamentos teóricos de ambos dominios y se analizan los
+  principales obstáculos que surgen al combinarlos: la aritmetización de la inferencia mediante
+  sistemas R1CS y programas aritméticos cuadráticos (QAP), la cuantización de pesos y activaciones a
+  aritmética de cuerpo finito y el manejo de funciones de activación no lineales como ReLU mediante
+  descomposición en \textit{bits} y tablas de búsqueda. Se revisan también algunos \textit{frameworks}
+  modernos, entre ellos \textit{EZKS}, \textit{Circom}, \textit{ZEN} y \textit{ZKML} y, por último,
+  se presenta una implementación en \texttt{MATLAB} como prueba de concepto que integra estas técnicas
+  de forma didáctica.
 \end{abstract}
 
+\newpage
+\tableofcontents
+\newpage
+
+% ==================================================================================================
+
 % Introducción
+\pagenumbering{arabic}
 \section{Introducción}
 
 En los últimos años, el aprendizaje automático ha experimentado un crecimiento sin precedentes, tanto
@@ -73,6 +234,7 @@ activaciones a aritmética de cuerpo finito, y el manejo de funciones de activac
 un enfoque en la función \textit{ReLU}. Por último, se presenta una implementación práctica en
 \textit{MATLAB} como prueba de concepto donde se integran los conceptos desarrollados.
 
+\pagebreak
 
 % Fundamentos teóricos
 \section{Fundamentos teóricos} \label{fundamentos}
@@ -547,7 +709,11 @@ del proceso de inferencia verificable, aunque sin alcanzar la complejidad de los
 modernos. Se llevará a cabo la cuantización de los pesos y activaciones, la aritmetización de la red
 neuronal mediante un sistema R1CS y la generación y verificación de la prueba.
 
+\pagebreak
+
 \section{Prueba de concepto en \textit{MATLAB}} \label{zkml_matlab}
+
+\pagebreak
 
 \bibliographystyle{ieeetr}
 \bibliography{refs}
