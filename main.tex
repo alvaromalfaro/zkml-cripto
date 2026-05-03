@@ -127,9 +127,9 @@
 \newcommand{\Portada}{%
   \begin{titlepage}
     \begin{center}
-      \includegraphics[height=1.5cm]{figs/Logo_UCLM_40.jpeg}%
+      \includegraphics[height=1cm]{figs/Logo_UCLM_40.jpeg}%
       \hfill%
-      \includegraphics[height=1.5cm]{figs/logo_ESII_AB_uclm.png}
+      \includegraphics[height=1cm]{figs/logo_ESII_AB_uclm.png}
 
       \vspace{0.6cm}
       {\color{uclm}\rule{\linewidth}{1.8pt}}
@@ -138,6 +138,8 @@
       \vfill
 
       {\Huge\bfseries\color{esii-negro}\TiTulo\par}
+      \vspace{0.3cm}
+      {\normalsize\textcolor{esii-plata}{\Asignatura}}
 
       \vfill
 
@@ -146,10 +148,9 @@
 
       {\large\bfseries\color{esii-negro}\Autor}\\[0.25cm]
       {\normalsize\textcolor{esii-gris}\AutorEmail}\\[0.15cm]
-      {\normalsize\textcolor{esii-plata}{\Asignatura}}\\
-      {\normalsize\textcolor{esii-plata}{\Escuela,}}
-      {\normalsize\textcolor{esii-plata}\Ciudad}\\[0.35cm]
-      {\normalsize\textcolor{esii-gris}\Fecha}
+      {\normalsize\textcolor{esii-gris}\Fecha}\\
+      {\normalsize\textcolor{esii-gris}{\Escuela,}}
+      {\normalsize\textcolor{esii-gris}\Ciudad}\\
 
       \vspace{0.4cm}
     \end{center}
@@ -165,7 +166,7 @@
 
 \begin{abstract}
   El aprendizaje automático se integra cada vez más en aplicaciones críticas bajo un modelo de
-  inferencia como servicio, en el que el proveedor no revela los detalles internos de su modelo.
+  inferencia como servicio en el que el proveedor no revela los detalles internos de su modelo.
   Esto introduce un problema de confianza: el usuario no puede verificar que la inferencia se ha
   realizado correctamente ni que el modelo empleado es el declarado. Las pruebas de conocimiento
   cero permiten demostrar la correcta ejecución de un cómputo sin revelar información secreta,
@@ -219,18 +220,19 @@ A pesar de su potencial, la aplicación de pruebas de conocimiento cero a modelo
 automático presenta grandes desafíos técnicos \cite{peng2026survey}. Los protocolos criptográficos
 operan sobre cuerpos finitos, mientras que los modelos de aprendizaje automático manejan números
 reales y operaciones no lineales. Unificar estos dos mundos requiere traducir la arquitectura de un
-modelo y su proceso de inferencia mediante técnicas de aritmetización, cuantificación y estrategias
+modelo y su proceso de inferencia mediante técnicas de aritmetización, cuantización y estrategias
 específicas para manejar la no linealidad.
 
-En este trabajo, se abordarán estos desafíos tanto desde una perspectiva teórica como práctica. En
-primer lugar, se presentarán los fundamentos teóricos necesarios para entender el aprendizaje
-automático y, en concreto, las redes neuronales artificiales, así como el concepto de pruebas de
-conocimiento cero. A continuación, se explorarán los obstáculos que surgen al trasladar la inferencia
-de una red neuronal a un circuito aritmético compatible con un sistema de prueba de conocimiento
-cero, incluyendo la aritmetización mediante sistemas R1CS, la cuantización de los pesos y las
-activaciones a aritmética de cuerpo finito, y el manejo de funciones de activación no lineales, con
-un enfoque en la función \textit{ReLU}. Por último, se presenta una implementación práctica en
-\textit{MATLAB} como prueba de concepto donde se integran los conceptos desarrollados.
+En este trabajo se abordarán estos desafíos tanto desde una perspectiva teórica como práctica. En
+primer lugar, en la Sección \ref{aprendizaje_automatico} se presentarán los fundamentos teóricos
+necesarios para entender el aprendizaje automático y, en concreto, las redes neuronales artificiales,
+así como el concepto de pruebas de conocimiento cero en la Sección \ref{zk}. A continuación, la
+Sección \ref{zkml} muestra los obstáculos que surgen al trasladar la inferencia de una red neuronal
+a un circuito aritmético compatible con un sistema de prueba de conocimiento cero, incluyendo la
+aritmetización mediante sistemas R1CS, la cuantización de los pesos y las activaciones a aritmética
+de cuerpo finito y el manejo de funciones de activación no lineales, con un enfoque en la función
+\textit{ReLU}. Por último, en la Sección \ref{zkml_matlab} se presenta una implementación práctica
+en \textit{MATLAB} como prueba de concepto donde se integran los conceptos desarrollados.
 
 \pagebreak
 
@@ -271,27 +273,25 @@ más común en la actualidad.
 
 En una red neuronal artificial, el proceso de \textbf{inferencia} se refiere a la generación de una
 salida a partir de una entrada dada, utilizando los pesos de los enlaces entre las neuronas. En cada
-neurona, se realiza una suma ponderada de las señales recibidas a través de sus enlaces. Así, en una
-cierta neurona $k$, la entrada total que recibe viene dada por
+neurona, se realiza una suma ponderada de las señales recibidas a través de sus enlaces
+\cite[Capítulo~6]{jurafsky2026speech}. Así, en una cierta neurona, dado un conjunto de entradas
+$x_1, x_2, \dots, x_n$ y un conjunto de pesos $w_1, w_2, \dots, w_n$ asociados a cada una de las
+entradas, la entrada total de la neurona se calcula como
 \begin{equation}
-  s_k(t) = \sum_{j} w_{jk}(t) y_j(t) + \theta_k(t) \label{na_entrada_total}
+  z = b + \sum_{i} w_i x_i \label{na_entrada_total}
 \end{equation}
-donde $w_{jk}(t)$ representa el peso del enlace que conecta la neurona $j$ con la neurona $k$,
-siendo $j$, normalmente, una neurona de la capa anterior \cite[Capítulo~2]{krose1996introduction}.
-En este caso, $t$ no representa un instante temporal, como sería el caso de las redes neuronales
-recurrentes, sino la posición de la capa en la red. Cuando el peso es positivo, se dice que el enlace
-es \textit{excitatorio}, mientras que, si es negativo, se dice que es \textit{inhibitorio}. Luego,
-$y_j(t)$ representa la señal de salida de la neurona $j$ y, finalmente, $\theta_k(t)$ representa el
-\textit{sesgo} de la neurona $k$, un valor constante que permite ajustar su umbral de activación.
+donde $b$ es el término de sesgo, un valor constante que permite ajustar su umbral de activación
+\cite{krose1996introduction}. Cuando un peso $w_i$ es positivo, se dice que el enlace es
+\textit{excitatorio}, mientras que, si es negativo, se dice que es \textit{inhibitorio}.
 
-Tras ello, la neurona $k$ aplica una \textit{función de activación} a su entrada total, $s_k(t)$,
-para generar su salida, tal que
+Tras ello, la neurona aplica una \textit{función de activación} a su entrada total, $z$, para generar
+su salida,
 \begin{equation}
-  y_k(t+1) = \mathcal{F}(s_k(t)) \label{na_activacion}
+  y = f(z) \label{na_activacion}
 \end{equation}
-En general, $\mathcal{F}$ suele ser una función no lineal debido a que esto es lo que permite a las
-redes neuronales aprender patrones complejos en los datos. Hay multitud de funciones de activación,
-sin embargo, no se profundizará en ellas debido a que no resulta especialmente relevante para el
+En general, $f$ suele ser una función no lineal debido a que esto es lo que permite a las redes
+neuronales aprender patrones complejos en los datos. Hay multitud de funciones de activación, sin
+embargo, no se profundizará en ellas debido a que no resulta especialmente relevante para el
 desarrollo del trabajo. Hay extensa literatura sobre el tema, por lo que una simple búsqueda de
 artículos o libros sobre redes neuronales artificiales o aprendizaje profundo proporcionará una gran
 cantidad de información al respecto
@@ -560,7 +560,47 @@ Al reducir todas las operaciones de la red neuronal a la verificación de la div
 polinomio, la verificadora puede comprobar la validez de la prueba evaluando los polinomios en un
 único punto aleatorio, gracias al Lema de \textit{Schwartz-Zippel} \cite[Capítulo~4]{thaler2022proofs}.
 
-\subsubsection{Cuantización y aritmética de punto fijo en \texorpdfstring{$\mathbb{F}_p$}{Fp}} \label{cuantizacion_aritmetica}
+\subsubsection{Compromisos polinómicos y \textit{blinding}}
+
+La aritmetización reduce la verificación de un cálculo a la comprobación de una identidad polinómica.
+Sin embargo, una verificación directa de la identidad no preserva el conocimiento cero, ya que los
+coeficientes de los polinomios $A(x)$, $B(x)$ y $C(x)$ son combinaciones lineales de las variables
+del vector testigo, por lo que su revelación expone la información que se desea proteger. Para que
+un \textit{SNARK} alcance la propiedad de conocimiento cero, es necesario un esquema de compromiso
+polinómico y un mecanismo de aleatorización, conocido como \textit{blinding}.
+
+Un \textbf{esquema de compromiso polinómico} (PCS, por sus siglas en inglés: \textit{Polynomial Commitment
+  Scheme}) es una construcción criptográfica que permite a una parte comprometerse al valor de un
+polinomio $f(x) \in \mathbb{F}_p[x]$ produciendo un valor corto denominado \textit{compromiso},
+normalmente un elemento de un grupo criptográfico, y abrir posteriormente el compromiso en cualquier
+punto $r$ revelando $f(r)$ junto con una prueba $\pi$ de que dicha evaluación es consistente con el
+polinomio comprometido \cite[Capítulo~7]{thaler2022proofs}. Un PCS debe cumplir dos propiedades:
+\begin{itemize}
+  \item \textbf{Vinculación} (\textit{binding}): una vez publicado el compromiso, la probadora no
+        puede abrir el compromiso a un valor distinto de $f(r)$ sin romper una asunción criptográfica
+        subyacente.
+  \item \textbf{Ocultación} (\textit{hiding}): el compromiso no revela información computacionalmente
+        útil sobre los coeficientes de $f$.
+\end{itemize}
+
+Con un PCS, el protocolo se modifica de forma que la probadora envía $\text{Com}(A)$, $\text{Com}(B)$,
+$\text{Com}(C)$ y $\text{Com}(H)$ en lugar de los polinomios. La verificadora, mediante \textit{Fiat-Shamir},
+deriva un punto $r$ y solicita las \textit{aperturas} en él. Así, la igualdad polinómica se comprueba
+sobre los valores abiertos; la verificadora nunca accede a los coeficientes de los polinomios.
+
+Ahora bien, las evaluaciones de $A(r)$, $B(r)$ y $C(r)$ siguen siendo combinaciones lineales del
+vector testigo, por lo que un verificador malicioso que observe múltiples evaluaciones podría
+plantear un sistema lineal y recuperar parte del testigo. Para evitarlo, se introduce el \textbf{blinding},
+en el que la probadora añade términos aleatorios a los polinomios antes de comprometerse a ellos, de
+forma que las evaluaciones fuera de los puntos de interpolación quedan aleatorizadas. Distintos
+\textit{SNARKs} emplean diferentes técnicas de \textit{blinding}. Por ejemplo, \textit{Groth}
+\cite{groth2016size} aleatoriza la propia prueba añadiendo términos aleatorios a los elementos $A, B, C$
+que la probadora envía. Otros sistemas, como \textit{PLONK} \cite{plonk2019} aleatorizan directamente
+los polinomios del circuito añadiendo múltiplos del polinomio de anulación $Z(x)$. En cualquier caso,
+el resultado es el mismo, las distribuciones de las pruebas reales y simuladas sean indistinguibles,
+garantizando así la propiedad de conocimiento cero.
+
+\subsubsection{Cuantización y aritmética en \texorpdfstring{$\mathbb{F}_p$}{Fp}} \label{cuantizacion_aritmetica}
 
 Tras establecer el proceso de aritmetización, ahora es necesario abordar el desafío de la
 incompatibilidad entre los tipos de datos y operaciones utilizados en los modelos de aprendizaje
@@ -586,7 +626,7 @@ es un entero de desplazamiento que representa el valor cero en la representació
 
 Un aspecto importante a destacar es que los pesos de una red neuronal pueden ser positivos y
 negativos, como se indicó en la Sección \ref{redes_neuronales}. Sin embargo, en un sistema de
-pruebas como \textit{zk-SNARK}, solo se pueden manejar enteros positivos, puesto que el campo
+pruebas como \textit{zk-SNARK}, solo se pueden manejar enteros positivos, puesto que el cuerpo
 finito $\mathbb{F}_p$ no incluye números negativos. Para representar números negativos, se puede
 utilizar el inverso aditivo módulo $p$, de forma que un valor $-x$ se representa como $p-x \in \mathbb{F}_p$.
 Esto es consistente con aritmética de cuerpos finitos, ya que $x + (p-x) \equiv 0\ (\mathrm{mod}\ p)$. Para
@@ -702,7 +742,7 @@ a modelos masivos.
 
 A pesar de los avances logrados por estas herramientas, su complejidad interna dificulta la comprensión
 de los mecanismos subyacentes. Para ilustrar el proceso completo de forma transparente y didáctica, se
-presenta, en la siguiente sección, una implementación simple en \textit{MATLAB} que reproduce las etapas
+presenta, en la siguiente sección, una implementación simple en \texttt{MATLAB} que reproduce las etapas
 del proceso de inferencia verificable, aunque sin alcanzar la complejidad de los \textit{frameworks}
 modernos. Se llevará a cabo la cuantización de los pesos y activaciones, la aritmetización de la red
 neuronal mediante un sistema R1CS y la generación y verificación de la prueba.
