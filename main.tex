@@ -181,7 +181,7 @@
   sistemas R1CS y programas aritméticos cuadráticos (QAP), la cuantización de pesos y activaciones a
   aritmética de cuerpo finito y el manejo de funciones de activación no lineales como ReLU mediante
   descomposición en \textit{bits} y tablas de búsqueda. Se revisan también algunos \textit{frameworks}
-  modernos, entre ellos \textit{EZKS}, \textit{Circom}, \textit{ZEN} y \textit{ZKML} y, por último,
+  modernos, entre ellos \textit{EZKL}, \textit{Circom}, \textit{ZEN} y \textit{zkLLM} y, por último,
   se presenta una implementación en \texttt{MATLAB} como prueba de concepto que integra estas técnicas
   de forma didáctica.
 \end{abstract}
@@ -560,7 +560,7 @@ Al reducir todas las operaciones de la red neuronal a la verificación de la div
 polinomio, la verificadora puede comprobar la validez de la prueba evaluando los polinomios en un
 único punto aleatorio, gracias al Lema de \textit{Schwartz-Zippel} \cite[Capítulo~4]{thaler2022proofs}.
 
-\subsubsection{Compromisos polinómicos y \textit{blinding}}
+\subsubsection{Compromisos polinómicos y \textit{blinding}} \label{compromisos_blinding}
 
 La aritmetización reduce la verificación de un cálculo a la comprobación de una identidad polinómica.
 Sin embargo, una verificación directa de la identidad no preserva el conocimiento cero, ya que los
@@ -750,6 +750,27 @@ neuronal mediante un sistema R1CS y la generación y verificación de la prueba.
 \pagebreak
 
 \section{Prueba de concepto en \textit{MATLAB}} \label{zkml_matlab}
+
+Tras haber establecido los fundamentos teóricos del problema y revisado algunos \textit{frameworks}
+modernos, en esta sección se presenta una implementación práctica en \texttt{MATLAB} que reproduce,
+de forma simplificada, el proceso completo de inferencia verificable sobre una red neuronal. El
+objetivo, al final, es adquirir una comprensión más profunda de los mecanismos subyacentes.
+
+Es importante destacar que la implementación tiene un propósito ilustrativo y didáctico. Su objetivo
+es reproducir el procedimiento que conecta la inferencia de una red neuronal con su verificación
+mediante una identidad polinómica: cuantización, aritmetización en R1CS, transformación a QAP,
+generación del polinomio cociente y verificación por evaluación en un punto aleatorio. Ahora bien,
+los componentes que dotan la propiedad de conocimiento cero, descritos en la Sección \ref{compromisos_blinding},
+quedan fuera del alcance de esta implementación. Su implementación requiere primitivas criptográficas,
+como grupos de orden primo grande y, en determinados casos, emparejamientos bilineales sobre curvas
+elípticas. Por tanto, el sistema implementado constituye un \textit{SNARK} sobre la inferencia de la
+red, pero no un \textit{zk-SNARK}.
+
+La implementación se incluye en un fichero \texttt{MATLAB} junto a esta memoria. La red neuronal
+escogida es deliberadamente pequeña ($2 \times 2 \times 1$ con activación \textit{ReLU} en la capa
+oculta) y un cuerpo finito también pequeño ($\mathbb{F}_{65537}$), de forma que todos los valores
+intermedios puedan inspeccionarse manualmente y los polinomios resultantes se manejan sin estructuras
+de datos especializadas.
 
 \pagebreak
 
