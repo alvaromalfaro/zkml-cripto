@@ -1,6 +1,6 @@
-# Inferencia verificable en modelos de Aprendizaje Automático mediante Pruebas de Conocimiento Cero
+# Inferencia verificable en modelos de Aprendizaje Automático
 
-**Verifiable Inference in Machine Learning Models using Zero-Knowledge Proofs**
+**Verifiable Inference in Machine Learning Models**
 
 > Trabajo académico para la asignatura de **Criptografía** — Escuela Superior de Ingeniería Informática, Universidad de Castilla-La Mancha (Albacete)
 >
