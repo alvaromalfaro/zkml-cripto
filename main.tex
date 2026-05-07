@@ -231,10 +231,12 @@ Sección \ref{zkml} muestra los obstáculos que surgen al trasladar la inferenci
 a un circuito aritmético compatible con un sistema de prueba de conocimiento cero, incluyendo la
 aritmetización mediante sistemas R1CS, la cuantización de los pesos y las activaciones a aritmética
 de cuerpo finito y el manejo de funciones de activación no lineales, con un enfoque en la función
-\textit{ReLU}. Por último, en la Sección \ref{zkml_matlab} se presenta una implementación práctica
-en \textit{MATLAB} como prueba de concepto donde se integran los conceptos desarrollados.
-
-\pagebreak
+\textit{ReLU}. En la Sección \ref{zkml_matlab} se presenta una implementación práctica en
+\textit{MATLAB} como prueba de concepto donde se integran todos los conceptos desarrollados \footnote{
+  El código LaTeX de esta memoria y la implementación en \texttt{MATLAB} se encuentra disponible en
+  el repositorio de \textit{GitHub} \url{https://github.com/alvaromalfaro/zkml-cripto}.
+}. Finalmente, el Anexo \ref{uso_ia} muestra cómo y con qué fin se ha utilizado la inteligencia
+artificial durante el desarrollo de este trabajo.
 
 % Fundamentos teóricos
 \section{Fundamentos teóricos} \label{fundamentos}
@@ -747,11 +749,9 @@ del proceso de inferencia verificable, aunque sin alcanzar la complejidad de los
 modernos. Se llevará a cabo la cuantización de los pesos y activaciones, la aritmetización de la red
 neuronal mediante un sistema R1CS y la generación y verificación de la prueba.
 
-\pagebreak
-
 \section{Prueba de concepto en \textit{MATLAB}} \label{zkml_matlab}
 
-Tras haber establecido los fundamentos teóricos del problema y revisado algunos \textit{frameworks}
+Tras haber establecido los fundamentos teóricos del problema y revisar algunos \textit{frameworks}
 modernos, en esta sección se presenta una implementación práctica en \texttt{MATLAB} que reproduce,
 de forma simplificada, el proceso completo de inferencia verificable sobre una red neuronal. El
 objetivo, al final, es adquirir una comprensión más profunda de los mecanismos subyacentes.
@@ -762,15 +762,158 @@ mediante una identidad polinómica: cuantización, aritmetización en R1CS, tran
 generación del polinomio cociente y verificación por evaluación en un punto aleatorio. Ahora bien,
 los componentes que dotan la propiedad de conocimiento cero, descritos en la Sección \ref{compromisos_blinding},
 quedan fuera del alcance de esta implementación. Su implementación requiere primitivas criptográficas,
-como grupos de orden primo grande y, en determinados casos, emparejamientos bilineales sobre curvas
+grupos de orden primo grande y, en determinados casos, emparejamientos bilineales sobre curvas
 elípticas. Por tanto, el sistema implementado constituye un \textit{SNARK} sobre la inferencia de la
 red, pero no un \textit{zk-SNARK}.
 
 La implementación se incluye en un fichero \texttt{MATLAB} junto a esta memoria. La red neuronal
-escogida es deliberadamente pequeña ($2 \times 2 \times 1$ con activación \textit{ReLU} en la capa
-oculta) y un cuerpo finito también pequeño ($\mathbb{F}_{65537}$), de forma que todos los valores
-intermedios puedan inspeccionarse manualmente y los polinomios resultantes se manejan sin estructuras
-de datos especializadas.
+escogida es deliberadamente pequeña, $2 \times 2 \times 1$ con activación \textit{ReLU} en la capa
+oculta (Figura \ref{fig:neural_network}) y un cuerpo finito también pequeño ($\mathbb{F}_{65537}$),
+de forma que todos los valores intermedios puedan inspeccionarse manualmente y los polinomios
+resultantes se manejan sin estructuras de datos especializadas.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{figs/poc_red.jpg}
+  \caption{Arquitectura de la red neuronal utilizada en la implementación.}
+  \label{fig:neural_network}
+\end{figure}
+
+\subsection{Cuantización y aritmética modular} \label{poc_cuantizacion_aritmetica}
+
+El primer paso del proceso consiste en transformar todos los valores que intervienen en la inferencia
+(entradas, pesos y activaciones) al dominio del cuerpo finito $\mathbb{F}_{65537}$. Para ello, se
+define un factor de escala $S = 16$. La cuantización de un valor real $r$ se realiza de acuerdo con
+la Ecuación \ref{cuantizacion}, con $Z = 0$ pues no se requiere un desplazamiento y el resultado se
+reduce módulo $65537$ ($r_q = \text{round}(r \cdot S) \pmod {65537}$). Los valores negativos se
+representan, como se explicó en la Sección \ref{cuantizacion_aritmetica}, mediante el inverso aditivo
+módulo $65537$. Así, un peso de $-0.5$ se cuantiza primero a $-8$ y, luego, se interpreta como
+$65537 - 8 = 65529 \in \mathbb{F}_{65537}$. En cualquier operación posterior, el módulo mantiene el
+valor dentro del rango $[0, 65536]$ y la interpretación de positivo o negativo se realiza únicamente
+al final, cuando se requiere recuperar el signo, por ejemplo, para evaluar la función de activación
+\textit{ReLU}.
+
+Un aspecto importante a destacar es que, como la aritmetización exige que cada multiplicación entre
+valores cuantizados se exprese como una restricción R1CS, no se realiza un reescalado intermedio
+entre capas. Esto implica que las unidades se acumulan a lo largo de la red. Tras la primera capa,
+los productos se encuentran en unidades de $S^2$, tras la segunda capa en unidades de $S^3$. Así, la
+salida cuantizada $y_q$ obtenida al final de la inferencia satisface $y \approx y_q / S^L$, donde
+$L$ es el número de capas. Esta acumulación es manejable en este caso, pero en redes neuronales
+profundas sería necesario introducir operaciones de reescalado que también deben ser aritmetizadas
+mediante restricciones R1CS adicionales, añadiendo más complejidad al proceso.
+
+\subsection{Aritmetización en R1CS} \label{poc_aritmetizacion_r1cs}
+
+Una vez la red neuronal reside en el dominio de $\mathbb{F}_{65537}$, la inferencia debe traducirse
+a un sistema de restricciones R1CS de la forma $A \cdot z \circ B \cdot z = C \cdot z$. El vector
+testigo $z$ incluye $n = 20$ variables agrupadas en cuatro categorías: la constante $1$ en la primera
+posición, las entradas y la salida públicas $x_1, x_2, y$, los pesos privados de la red $W_1, W_2$
+y diez variables intermedias correspondientes a productos parciales, \textit{bits} de signo y
+activaciones tras la función \textit{ReLU}. Luego, para la formulación de las restricciones, la
+inferencia genera $m = 11$ restricciones que cubren los productos peso-entrada de la primera capa,
+las dos aplicaciones de \textit{ReLU}, los productos peso-activación de la capa de salida y la suma
+final. La especificación completa del testigo y las matrices $A$, $B$ y $C$ se incluyen en el código
+\texttt{MATLAB} adjunto.
+
+Sí resulta interesante examinar una restricción que muestra los dos mecanismos no triviales que
+surgen al aritmetizar la red neuronal. Por un lado, considerando la restricción correspondiente a la
+activación de la primera neurona oculta
+\begin{equation}
+  (t_1 + t_2) \cdot sgn_1 = a_{1,1} \label{restriccion_relu}
+\end{equation}
+donde $t_1 = w_{11} \cdot x_1$ y $t_2 = w_{12} \cdot x_2$ son productos calculados en restricciones
+anteriores, $sgn_1 \in \{0, 1\}$ es una variable que indica si la entrada a la función de activación
+es positiva o negativa y $a_{1,1}$ es la salida tras aplicar \textit{ReLU}. Esta restricción se
+codifica colocando dos coeficientes no nulos en la fila $i = 5$ de la matriz $A$ (en las columnas de
+$t_1$ y $t_2$), un coeficiente no nulo en la columna de $sgn_1$ en $B$ y un coeficiente no nulo en la
+columna de $a_{1,1}$ en $C$. De este modo, $A \cdot z$ produce $t_1 + t_2$ sin necesidad de
+introducir una restricción dedicada para sumar, pues queda realizada por la propia combinación
+lineal.
+
+El otro mecanismo, la implementación de \textit{ReLU} como producto $s \cdot sgn$ siguiendo la
+Ecuación \ref{relu_restriccion}, requiere una observación importante. Tal como se ha desarrollado en
+la Sección \ref{lidiando_no_linealidad}, garantizar que $sgn_1$ refleje el signo de la pre-activación
+requiere una descomposición en bits, lo que añade $\lceil \log_2(65537) \rceil = 17$ restricciones
+adicionales por activación. Esta implementación omite esa descomposición y se limita a imponer que
+$sgn_1$ sea booleano mediante la restricción $sgn_1 \cdot sgn_1 = sgn_1$, lo que supone una
+simplificación y se confía en que la probadora proporcione el \textit{bit} de signo correcto. Esto
+sería inadmisible en un sistema real, donde una probadora maliciosa podría declarar $sgn_1 = 1$ para
+una entrada negativa. Sin embargo, para el propósito de esta implementación y para no saturar el
+sistema de restricciones, se ha optado por esta simplificación.
+
+\subsection{Transformación a QAP} \label{poc_transformacion_qap}
+
+Tras construir el sistema R1CS, verificar las $m = 11$ restricciones requeriría que la verificadora
+accediese al vector testigo, comprometiendo cualquier intento de conocimiento cero. La transformación
+a un Programa Aritmético Cuadrático (QAP) condensa el sistema entero en una única identidad polinómica.
+
+La idea parte de asignar los enteros $\{1, 2, \ldots, m\}$ a las $m$ restricciones y se interpretan
+las columnas de las matrices $A,B,C$ como vectores de valores indexados por esos puntos, la
+interpolación de \textit{Lagrange} permite construir, para cada columna $j$, tres polinomios
+$L_j^A(x)$, $L_j^B(x)$ y $L_j^C(x)$ de grado máximo $m-1$ tales que $L_j^A(i) = A_{ij}$, e igual para
+$B$ y $C$. Al combinarlos con el testigo, se obtienen los polinomios $A(x) = \sum_{j} z_j \cdot L_j^A(x)$,
+$B(x) = \sum_{j} z_j \cdot L_j^B(x)$ y $C(x) = \sum_{j} z_j \cdot L_j^C(x)$, que satisfacen
+$A(i) = (A \cdot z)_i$ en cada punto de evaluación. Lo mismo se realiza para $B(i)$ y $C(i)$.
+
+Así, si el testigo es válido, $T(x) = A(x) \cdot B(x) - C(x)$ se anula en los $m$ puntos y es
+divisible por el polinomio de anulación $Z(x) = \prod_{i=1}^m (x - i)$, existiendo un cociente
+$H(x) = T(x) / Z(x)$ que satisface la Ecuación \ref{qap}, es decir, todas las restricciones se
+cumplen simultáneamente.
+
+\subsection{Verificación y solidez} \label{poc_verificacion_solidez}
+
+La verificación de la prueba se reduce a comprobar la identidad de la Ecuación \ref{qap}. La clave
+está en aplicar el lema de \textit{Schwartz-Zippel}. Por él, dados dos polinomios distintos $p_1$ y
+$q_1$ de grado máximo $d$ sobre $\mathbb{F}_p$, la probabilidad de que coincidan en un un punto $r$
+elegido uniformemente al azar está acotada por $d/p$. Basta entonces con que la verificadora elija
+un punto $r \in \mathbb{F}_{65537}$ y compruebe $A(r) \cdot B(r) - C(r) = H(r) \cdot Z(r) \pmod {65537}$.
+Con $d \leq 20$ y $p = 65537$, la cota es aproximadamente $0.0003$, en un sistema real, con $p$ grande,
+hace esta probabilidad despreciable.
+
+Al seleccionar $r$, se han excluido los puntos de interpolación $\{1, 2, \ldots, m\}$, pues en ellos
+$Z(r) = 0$ y se cumple la igualdad para cualquier $H(r)$. Además, en un sistema real, el punto $r$
+no se escoge mediante un generador de números aleatorios, sino que se deriva mediante la heurística
+de \textit{Fiat-Shamir}, aplicando una función \textit{hash} sobre los compromisos polinómicos del
+protocolo.
+
+Finalmente, para verificar la propiedad de solidez, se muestra como una probadora maliciosa ``altera''
+los pesos del modelo, $w_{11}$ en concreto, tras publicar la prueba honesta e intentar reutilizar el
+polinomio $H(x)$ original. Al recalcular $A(r)$ con el testigo alterado, la igualdad deja de cumplirse
+y la verificadora rechaza la prueba. Con ello, aunque la implementación no incluye el mecanismo de
+conocimiento cero, sí satisface las propiedades de completitud y solidez computacional, constituyendo
+un SNARK sobre la inferencia de la red neuronal sobre el cual, un sistema completo, añadiría los
+compromisos polinómicos y el \textit{blinding} para alcanzar el conocimiento cero.
+
+\pagebreak
+
+\section{Conclusiones} \label{conclusiones}
+
+\pagebreak
+
+\appendix
+\section{Uso de IA en el desarrollo de este trabajo} \label{uso_ia}
+
+Durante la realización del trabajo, se ha utilizado la inteligencia artificial para diferentes
+propósitos que se detallan a continuación:
+\begin{itemize}
+  \item \textbf{Búsqueda y revisión bibliográfica}: se ha empleado la herramienta \textit{NotebookLM}
+        de Google para realizar una búsqueda inicial de información sobre el campo de \textit{ZKML}
+        y un filtrado preliminar de artículos. Posteriormente, utilizando la función de preguntas y
+        respuestas, se llevaron a cabo algunas consultas específicas sobre conceptos técnicos que no
+        estaban claros, facilitando la comprensión de ciertos aspectos teóricos.
+  \item \textbf{Estructuración}: una vez recopilada la información y definidos los aspectos a tratar,
+        se utilizó, también, \textit{NotebookLM} para generar la estructura de contenidos de la
+        memoria, buscando organizar los temas de forma lógica.
+  \item \textbf{Plantilla LaTeX}: la plantilla de LaTeX utilizada para esta memoria se obtuvo a
+        mediante \textit{Claude}, que generó un ejemplo de plantilla académica a partir de la
+        estructura definida, indicando que se trataba de un trabajo para una asignatura y solicitando
+        que incluyese la identidad visual de la universidad.
+  \item \textbf{Implementación}: durante la implementación en \texttt{MATLAB}, se empleó
+        \textit{Claude Code} para organizar la implementación, resolver dudas puntuales y durante la
+        transformación de la aritmetización a QAP, donde se le solicitó generar las funciones de
+        división de polinomios, la interpolación de \textit{Lagrange} y la evaluación de polinomios
+        en un punto dado sobre cuerpos finitos.
+\end{itemize}
 
 \pagebreak
 
