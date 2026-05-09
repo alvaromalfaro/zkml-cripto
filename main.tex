@@ -749,6 +749,8 @@ del proceso de inferencia verificable, aunque sin alcanzar la complejidad de los
 modernos. Se llevará a cabo la cuantización de los pesos y activaciones, la aritmetización de la red
 neuronal mediante un sistema R1CS y la generación y verificación de la prueba.
 
+\pagebreak
+
 \section{Prueba de concepto en \textit{MATLAB}} \label{zkml_matlab}
 
 Tras haber establecido los fundamentos teóricos del problema y revisar algunos \textit{frameworks}
@@ -888,6 +890,45 @@ compromisos polinómicos y el \textit{blinding} para alcanzar el conocimiento ce
 
 \section{Conclusiones} \label{conclusiones}
 
+A lo largo de este trabajo se ha explorado el camino que va desde la formulación de las pruebas de
+conocimiento cero hasta su aplicación sobre un cómputo concreto, la inferencia de una red neuronal,
+atravesando los obstáculos que surgen al intentar unificar dos mundos tan distintos como el de la
+criptografía y el del aprendizaje automático. La necesidad del usuario de verificar una inferencia y
+el interés del proveedor de mantener su propiedad intelectual es, en principio, resoluble, pero
+costosa en la práctica.
+
+La parte teórica ha demostrado que la traducción de una red neuronal a un sistema de pruebas de
+conocimiento cero no es trivial; requiere reescribir la inferencia en un lenguaje totalmente
+distinto. La cuantización de los valores al cuerpo finito, la aritmetización mediante sistemas R1CS y,
+sobre todo, gestionar la no linealidad introducida por las funciones de activación conllevan un coste
+adicional significativo. Los trabajos reciente de \textit{Feng et al.} \cite{feng2021zen} y
+\textit{Sun et al.} \cite{sun2024zkllm} han demostrado que generar una prueba puede ser varios
+órdenes de magnitud más lento que la propia inferencia. La aparición de herramientas especializadas
+y de técnicas como las tablas de búsqueda ha permitido reducir este coste, pero sigue siendo un área
+activa de investigación en la que aún quedan desafíos por resolver.
+
+La implementación práctica en \texttt{MATLAB} ha permitido reproducir, sobre una red neuronal pequeña,
+las etapas que permiten constuir un SNARK sobre la inferencia: cuantización, construcción del sistema
+R1CS, transformación a QAP mediante interpolación de \textit{Lagrange} y verificación final por
+evaluación en un punto aleatorio. La elección de una red neuronal pequeña y un cuerpo finito manejable
+ha facilitado la inspección manual del vector testigo, las matrices de restricciones y los polinomios
+resultantes, lo que ha contribuido a una comprensión más profunda del proceso. Ahora bien, esa misma
+transparencia obliga a ser honesto respecto a ella. La implementación no incluye los mecanismos que
+dotarían al sistema de la propiedad de conocimiento cero, como los esquemas de compromiso polinómico,
+el \textit{blinding} o la generación de desafíos mediante \textit{Fiat-Shamir}, que quedan fuera del
+alcance de esta implementación. Por otro lado, la implementación de \textit{ReLU} se ha simplificado,
+omitiendo la descomposición en bits y apoyándose en una restricción que solo garantiza que el
+\textit{bit} de signo es booleano, sin verificar que realmente refleja el signo de la pre-activación.
+Esto, aunque aceptable para el propósito de esta implementación, dejaría la puerta abierta a una
+probadora maliciosa que podría declarar un signo incorrecto.
+
+El campo de \textit{ZKML} es un área de investigación activa, con poco recorrido. A medida que los
+modelos de aprendizaje automático se vuelven más complejos y se despliegan en escenarios donde la
+privacidad y los resultados verificables son cruciales, es de esperar que pase de ser un campo
+emergente a un requisito fundamental de infraestructura. El presente trabajo buscaba servir como una
+forma de ver qué investigaciones se están realizando en la intersección entre criptografía y
+aprendizaje automático; ha cumplido ese objetivo.
+
 \pagebreak
 
 \appendix
@@ -898,21 +939,22 @@ propósitos que se detallan a continuación:
 \begin{itemize}
   \item \textbf{Búsqueda y revisión bibliográfica}: se ha empleado la herramienta \textit{NotebookLM}
         de Google para realizar una búsqueda inicial de información sobre el campo de \textit{ZKML}
-        y un filtrado preliminar de artículos. Posteriormente, utilizando la función de preguntas y
-        respuestas, se llevaron a cabo algunas consultas específicas sobre conceptos técnicos que no
-        estaban claros, facilitando la comprensión de ciertos aspectos teóricos.
+        y un filtrado preliminar de artículos. Posteriormente, durante la redacción de la memoria, y
+        utilizando la función de preguntas y respuestas, se llevaron a cabo algunas consultas
+        específicas sobre conceptos técnicos que no estaban claros, facilitando la comprensión de
+        ciertos aspectos teóricos.
   \item \textbf{Estructuración}: una vez recopilada la información y definidos los aspectos a tratar,
         se utilizó, también, \textit{NotebookLM} para generar la estructura de contenidos de la
-        memoria, buscando organizar los temas de forma lógica.
-  \item \textbf{Plantilla LaTeX}: la plantilla de LaTeX utilizada para esta memoria se obtuvo a
-        mediante \textit{Claude}, que generó un ejemplo de plantilla académica a partir de la
-        estructura definida, indicando que se trataba de un trabajo para una asignatura y solicitando
-        que incluyese la identidad visual de la universidad.
+        memoria (un índice de contenidos), buscando organizar los temas de forma lógica.
+  \item \textbf{Plantilla LaTeX}: la plantilla en LaTeX utilizada para esta memoria se obtuvo a
+        mediante \textit{Claude}, que generó una académica a partir de la estructura definida,
+        indicando que se trataba de un trabajo para una asignatura y solicitando que incluyese la
+        identidad visual de la universidad.
   \item \textbf{Implementación}: durante la implementación en \texttt{MATLAB}, se empleó
-        \textit{Claude Code} para organizar la implementación, resolver dudas puntuales y durante la
-        transformación de la aritmetización a QAP, donde se le solicitó generar las funciones de
-        división de polinomios, la interpolación de \textit{Lagrange} y la evaluación de polinomios
-        en un punto dado sobre cuerpos finitos.
+        \textit{Claude Code} para resolver dudas puntuales y durante la transformación de la
+        aritmetización a QAP, donde se le solicitó generar las funciones de división de polinomios,
+        la interpolación de \textit{Lagrange} y la evaluación de polinomios en un punto dado sobre
+        cuerpos finitos.
 \end{itemize}
 
 \pagebreak
