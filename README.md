@@ -49,32 +49,15 @@ La implementación (`zkml_poc.mlx`) reproduce de forma simplificada el proceso c
 
 > Nota: la implementación constituye un SNARK sobre la inferencia, pero no un zk-SNARK completo, ya que los componentes que aportan la propiedad de conocimiento cero (compromisos criptográficos, grupos de orden primo grande, emparejamientos bilineales) quedan fuera del alcance didáctico.
 
-### Compilación del documento LaTeX
-
-El documento utiliza **XeLaTeX** (por `fontspec` y `polyglossia`). Para compilarlo:
-
-```bash
-xelatex main.tex
-bibtex main
-xelatex main.tex
-xelatex main.tex
-```
-
-O con `latexmk`:
-
-```bash
-latexmk -xelatex main.tex
-```
-
 ---
 
 ## English
 
 ### Description
 
-This paper studies the intersection of **machine learning** and **zero-knowledge proofs** (ZKPs), a field known as *Zero-Knowledge Machine Learning* (ZKML). The starting point is the inference-as-a-service business model: a provider deploys a trained model and responds to queries without revealing its weights. This creates a trust problem — the user has no way to know whether the provider actually ran the model it claims to run, or whether it did so correctly — while the provider has legitimate incentives to keep its weights secret. Zero-knowledge proofs allow one party to convince another that a computation was performed correctly without revealing any secret information about it, offering a theoretical solution to this tension.
+This project studies the intersection of **machine learning** and **zero-knowledge proofs** (ZKPs), a field known as *Zero-Knowledge Machine Learning* (ZKML). The starting point is the inference-as-a-service business model: a provider deploys a trained model and responds to queries without revealing its weights. This creates a trust problem — the user has no way to know whether the provider actually ran the model it claims to run, or whether it did so correctly — while the provider has legitimate incentives to keep its weights secret. Zero-knowledge proofs allow one party to convince another that a computation was performed correctly without revealing any secret information about it, offering a theoretical solution to this tension.
 
-The paper covers:
+The report covers:
 
 - **Artificial neural network fundamentals**: inference, training, and activation functions.
 - **Zero-knowledge proofs**: interactive proofs, proof systems, SNARKs, and zk-SNARKs.
@@ -89,12 +72,12 @@ The paper covers:
 
 | File / Directory | Description |
 |---|---|
-| `main.tex` | Main LaTeX source of the paper |
-| `main.pdf` | Compiled PDF of the paper |
+| `main.tex` | Main LaTeX source of the report |
+| `main.pdf` | Compiled PDF of the report |
 | `refs.bib` | BibTeX bibliography |
 | `zkml_poc.mlx` | MATLAB implementation (*Live Script*) |
 | `zkml_poc.pdf` | PDF export of the MATLAB implementation |
-| `figs/` | Figures and images used in the paper |
+| `figs/` | Figures and images used in the report |
 
 ### MATLAB proof of concept
 
@@ -106,20 +89,3 @@ The implementation (`zkml_poc.mlx`) reproduces, in a simplified form, the full v
 4. **Verification**: compute the quotient polynomial H and verify the polynomial identity by evaluation at a random point.
 
 > Note: the implementation constitutes a SNARK over the inference, but not a full zk-SNARK, since the components that provide the zero-knowledge property (cryptographic commitments, large-prime-order groups, bilinear pairings) are out of scope for this didactic exercise.
-
-### Compiling the LaTeX document
-
-The document uses **XeLaTeX** (due to `fontspec` and `polyglossia`). To compile:
-
-```bash
-xelatex main.tex
-bibtex main
-xelatex main.tex
-xelatex main.tex
-```
-
-Or with `latexmk`:
-
-```bash
-latexmk -xelatex main.tex
-```
