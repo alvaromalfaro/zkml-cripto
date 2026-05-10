@@ -49,6 +49,12 @@ La implementación (`zkml_poc.mlx`) reproduce de forma simplificada el proceso c
 
 > Nota: la implementación constituye un SNARK sobre la inferencia, pero no un zk-SNARK completo, ya que los componentes que aportan la propiedad de conocimiento cero (compromisos criptográficos, grupos de orden primo grande, emparejamientos bilineales) quedan fuera del alcance didáctico.
 
+### Licencia
+
+El código fuente está licenciado bajo MIT (ver `LICENSE`).
+La memoria está licenciada bajo 
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
 ---
 
 ## English
@@ -89,3 +95,9 @@ The implementation (`zkml_poc.mlx`) reproduces, in a simplified form, the full v
 4. **Verification**: compute the quotient polynomial H and verify the polynomial identity by evaluation at a random point.
 
 > Note: the implementation constitutes a SNARK over the inference, but not a full zk-SNARK, since the components that provide the zero-knowledge property (cryptographic commitments, large-prime-order groups, bilinear pairings) are out of scope for this didactic exercise.
+
+### License
+
+The source code is distributed under the MIT License (see `LICENSE`).
+The accompanying report is released under 
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
